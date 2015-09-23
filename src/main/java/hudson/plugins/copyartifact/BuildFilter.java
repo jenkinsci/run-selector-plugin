@@ -23,6 +23,8 @@
  */
 package hudson.plugins.copyartifact;
 
+import javax.annotation.Nonnull;
+
 import hudson.EnvVars;
 import hudson.model.Run;
 
@@ -33,12 +35,25 @@ import hudson.model.Run;
 public class BuildFilter {
 
     /**
-     * Can this build be selected?
-     * @param run Build to check
-     * @param env Environment for build that is copying artifacts
-     * @return True if this build may be selected; default implementation always returns true.
+     * @param run
+     * @param env
+     * @return
+     * @deprecated implement {@link #isSelectable(Run, CopyArtifactPickContext)} instead.
      */
+    @Deprecated
     public boolean isSelectable(Run<?,?> run, EnvVars env) {
         return true;
+    }
+
+    /**
+     * @param candidate the build to check
+     * @param context the context of current copyartifact execution.
+     * @return whether this build can be selected.
+     * 
+     * @since 2.0
+     */
+    public boolean isSelectable(@Nonnull Run<?, ?> candidate, @Nonnull CopyArtifactPickContext context) {
+        // for backward compatibility.
+        return isSelectable(candidate, context.getEnvVars());
     }
 }
