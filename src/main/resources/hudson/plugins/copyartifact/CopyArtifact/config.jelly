@@ -31,6 +31,9 @@ THE SOFTWARE.
   <f:entry field="optional">
     <f:checkbox title="${%Optional}" />
   </f:entry>
+  <f:entry field="verbose">
+    <f:checkbox title="${%Debug output}" />
+  </f:entry>
   <f:advanced>
     <f:entry title="${%Result variable suffix}" field="resultVariableSuffix">
       <f:textbox/>
