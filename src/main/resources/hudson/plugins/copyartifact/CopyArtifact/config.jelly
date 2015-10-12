@@ -27,7 +27,7 @@ THE SOFTWARE.
     <f:editableComboBox items="${app.topLevelItemNames}" clazz="setting-input"/>
   </f:entry>
   <f:dropdownDescriptorSelector field="selector" title="${%Which build}"/>
-  <f:dropdownDescriptorSelector field="buildFilter" title="${%Build filters}" descriptors="${descriptor.buildFilterDescriptorList}" />
+  <f:dropdownDescriptorSelector field="buildFilter" title="${%Build filter}" descriptors="${descriptor.buildFilterDescriptorList}" />
   <f:entry field="optional">
     <f:checkbox title="${%Optional}" />
   </f:entry>
