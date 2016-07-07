@@ -23,19 +23,16 @@
  */
 package hudson.plugins.copyartifact;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
-
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * Copy artifacts from the specific status build.
@@ -45,28 +42,28 @@ public class StatusBuildSelector extends BuildSelector {
     public static enum BuildStatus {
         /** Stable builds.*/
         Stable(Messages._StatusBuildSelector_BuildStatus_Stable()),
-        
+
         /** Stable or Unstable builds.*/
         Successful(Messages._StatusBuildSelector_BuildStatus_Successful()),
-        
+
         /** Unstable builds. */
         Unstable(Messages._StatusBuildSelector_BuildStatus_Unstable()),
-        
+
         /** Failed builds. */
         Failed(Messages._StatusBuildSelector_BuildStatus_Failed()),
-        
+
         /** Completed builds with any build results.*/
         Completed(Messages._StatusBuildSelector_BuildStatus_Completed()),
-        
+
         /** Any builds including incomplete (running) ones.*/
         Any(Messages._StatusBuildSelector_BuildStatus_Any()),
-        
+
         ;
         private final Localizable displayName;
         private BuildStatus(Localizable displayName) {
             this.displayName = displayName;
         }
-        
+
         public String getDisplayName() {
             return displayName.toString();
         }
@@ -78,15 +75,6 @@ public class StatusBuildSelector extends BuildSelector {
 
     @Deprecated
     private transient Boolean stable;
-
-    /**
-     * @param stable true to select only stable builds, false to select stable and unstable builds.
-     * @deprecated use {@link #StatusBuildSelector(BuildStatus)} instead.
-     */
-    @Deprecated
-    public StatusBuildSelector(boolean stable) {
-        this(stable?BuildStatus.Stable:BuildStatus.Successful);
-    }
 
     /**
      * @since 2.0
@@ -102,15 +90,6 @@ public class StatusBuildSelector extends BuildSelector {
     @DataBoundConstructor
     public StatusBuildSelector(@CheckForNull BuildStatus buildStatus) {
         this.buildStatus = (buildStatus != null)?buildStatus:BuildStatus.Stable;
-    }
-
-    @SuppressWarnings("unused")
-    @SuppressFBWarnings(value="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification="checks null to ensure it is @Nonnull")
-    private StatusBuildSelector readResolve() {
-        if (buildStatus == null) {
-            return new StatusBuildSelector(stable != null ? stable.booleanValue() : true);
-        }
-        return this;
     }
 
     /**
@@ -191,7 +170,7 @@ public class StatusBuildSelector extends BuildSelector {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -203,7 +182,7 @@ public class StatusBuildSelector extends BuildSelector {
                 getBuildStatus().toString()
         );
     }
-    
+
     @Extension(ordinal=100)
     public static final Descriptor<BuildSelector> DESCRIPTOR =
             new SimpleBuildSelectorDescriptor(

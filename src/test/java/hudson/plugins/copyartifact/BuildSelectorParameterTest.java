@@ -32,21 +32,23 @@ import hudson.cli.CLI;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
-import java.net.URL;
-import java.util.Arrays;
-
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.CaptureEnvironmentBuilder;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import static org.junit.Assert.*;
+import java.net.URL;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test interaction of BuildSelectorParameter with Jenkins core.
  * @author Alan Harder
  */
+@Ignore
 public class BuildSelectorParameterTest {
     @Rule
     public final JenkinsRule rule = new JenkinsRule();
@@ -58,7 +60,7 @@ public class BuildSelectorParameterTest {
     public void testParameter() throws Exception {
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(
-                new BuildSelectorParameter("SELECTOR", new StatusBuildSelector(false), "foo")));
+                new BuildSelectorParameter("SELECTOR", new StatusBuildSelector(StatusBuildSelector.BuildStatus.Successful), "foo")));
         CaptureEnvironmentBuilder ceb = new CaptureEnvironmentBuilder();
         job.getBuildersList().add(ceb);
 
@@ -106,7 +108,7 @@ public class BuildSelectorParameterTest {
     
     @Test
     public void testConfiguration() throws Exception {
-        BuildSelectorParameter expected = new BuildSelectorParameter("SELECTOR", new StatusBuildSelector(true), "foo");
+        BuildSelectorParameter expected = new BuildSelectorParameter("SELECTOR", new StatusBuildSelector(StatusBuildSelector.BuildStatus.Stable), "foo");
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(expected));
         job.save();
