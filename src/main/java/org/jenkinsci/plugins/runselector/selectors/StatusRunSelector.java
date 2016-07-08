@@ -29,7 +29,7 @@ import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunSelector;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -98,7 +98,7 @@ public class StatusRunSelector extends RunSelector {
      * {@inheritDoc}
      */
     @Override
-    public Run<?, ?> getNextBuild(Job<?, ?> job, RunSelectorPickContext context) {
+    public Run<?, ?> getNextBuild(Job<?, ?> job, RunSelectorContext context) {
         Run<?, ?> previousBuild = context.getLastMatchBuild();
         if (previousBuild == null) {
             // the first time

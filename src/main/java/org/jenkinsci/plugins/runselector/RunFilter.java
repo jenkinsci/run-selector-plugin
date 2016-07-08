@@ -30,7 +30,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 
 import javax.annotation.Nonnull;
@@ -50,7 +50,7 @@ public class RunFilter extends AbstractDescribableImpl<RunFilter> implements Ext
      * @param context the context of current runselector execution.
      * @return whether this build can be selected.
      */
-    public boolean isSelectable(@Nonnull Run<?, ?> candidate, @Nonnull RunSelectorPickContext context) {
+    public boolean isSelectable(@Nonnull Run<?, ?> candidate, @Nonnull RunSelectorContext context) {
         return true;
     }
     

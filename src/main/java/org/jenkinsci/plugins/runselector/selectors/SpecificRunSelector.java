@@ -29,7 +29,7 @@ import hudson.model.Job;
 import hudson.model.PermalinkProjectAction;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunSelector;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.CheckForNull;
@@ -55,7 +55,7 @@ public class SpecificRunSelector extends AbstractSpecificRunSelector {
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context) throws IOException, InterruptedException {
+    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) throws IOException, InterruptedException {
         String num = context.getEnvVars().expand(buildNumber);
         if (num.startsWith("$")) {
             context.logDebug("unresolved variable {0}", num);

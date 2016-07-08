@@ -34,7 +34,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.CheckForNull;
@@ -71,7 +71,7 @@ public class ParameterizedRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(Run<?, ?> candidate, RunSelectorPickContext context) {
+    public boolean isSelectable(Run<?, ?> candidate, RunSelectorContext context) {
         String xml = context.getEnvVars().expand(getParameter());
         context.logDebug("{0}: Expanded run filter: {1}", getDisplayName(), xml);
         RunFilter filter = getFilterFromXml(xml);

@@ -33,7 +33,7 @@ import hudson.model.Run;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -100,10 +100,10 @@ public class TriggeringRunSelector extends RunSelector {
         public boolean isForGlobalSetting() {
             return forGlobalSetting;
         }
-    };
+    }
     
     /**
-     * An extension for {@link RunSelectorPickContext}
+     * An extension for {@link RunSelectorContext}
      * that holds enumeration status.
      */
     private static class ContextExtension {
@@ -167,13 +167,13 @@ public class TriggeringRunSelector extends RunSelector {
      */
     @Override
     @CheckForNull
-    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context) {
+    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
         ContextExtension ext = context.getExtension(ContextExtension.class);
         if (ext == null) {
             // first time to be called.
             ext = new ContextExtension();
             List<Run<?, ?>> result = new ArrayList<Run<?, ?>>(
-                    getAllUpstreamBuilds(job, context, context.getCopierBuild())
+                    getAllUpstreamBuilds(job, context, context.getCurrentRun())
             );
             // sort builds by the strategy.
             Collections.sort(
@@ -201,7 +201,7 @@ public class TriggeringRunSelector extends RunSelector {
     }
     
     @Nonnull
-    private HashSet<Run<?, ?>> getAllUpstreamBuilds(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context, @Nonnull Run<?, ?> parent) {
+    private HashSet<Run<?, ?>> getAllUpstreamBuilds(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context, @Nonnull Run<?, ?> parent) {
         HashSet<Run<?, ?>> result = new HashSet<Run<?, ?>>();
         
         // Upstream job for matrix will be parent project, not only individual configuration:

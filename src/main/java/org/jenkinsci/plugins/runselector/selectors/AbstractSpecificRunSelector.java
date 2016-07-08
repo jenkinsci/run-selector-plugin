@@ -27,7 +27,7 @@ package org.jenkinsci.plugins.runselector.selectors;
 import hudson.model.Job;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunSelector;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -35,7 +35,7 @@ import java.io.IOException;
 
 /**
  * {@link RunSelector} enumerates only one build.
- * override {{@link #getBuild(Job, RunSelectorPickContext)} instead.
+ * override {{@link #getBuild(Job, RunSelectorContext)} instead.
  */
 public abstract class AbstractSpecificRunSelector extends RunSelector {
     /**
@@ -43,7 +43,7 @@ public abstract class AbstractSpecificRunSelector extends RunSelector {
      */
     @Override
     @CheckForNull
-    public final Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context) throws IOException, InterruptedException {
+    public final Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) throws IOException, InterruptedException {
         if (context.getLastMatchBuild() != null) {
             return null;
         }
@@ -60,5 +60,5 @@ public abstract class AbstractSpecificRunSelector extends RunSelector {
      * @throws InterruptedException if any thread interrupts the current thread.
      */
     @CheckForNull
-    public abstract Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context) throws IOException, InterruptedException;
+    public abstract Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) throws IOException, InterruptedException;
 }

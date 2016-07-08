@@ -28,7 +28,7 @@ import hudson.Extension;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
@@ -71,7 +71,7 @@ public class AndRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(Run<?, ?> candidate, RunSelectorPickContext context) {
+    public boolean isSelectable(Run<?, ?> candidate, RunSelectorContext context) {
         for (RunFilter filter: getRunFilterList()) {
             if (!filter.isSelectable(candidate, context)) {
                 context.logDebug(

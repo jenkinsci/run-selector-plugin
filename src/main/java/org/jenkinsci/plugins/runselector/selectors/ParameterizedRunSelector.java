@@ -29,7 +29,7 @@ import hudson.model.Job;
 import hudson.model.Run;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.runselector.RunSelector;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.CheckForNull;
@@ -54,7 +54,7 @@ public class ParameterizedRunSelector extends RunSelector {
     }
 
     @CheckForNull
-    private RunSelector getSelector(@Nonnull RunSelectorPickContext context) {
+    private RunSelector getSelector(@Nonnull RunSelectorContext context) {
         String xml = resolveParameter(context);
         if (xml == null) {
             return null;
@@ -69,7 +69,7 @@ public class ParameterizedRunSelector extends RunSelector {
 
     @SuppressWarnings("deprecation")
     @Override
-    public Run<?, ?> pickBuildToCopyFrom(Job<?, ?> job, RunSelectorPickContext context)
+    public Run<?, ?> pickBuildToCopyFrom(Job<?, ?> job, RunSelectorContext context)
             throws IOException, InterruptedException
     {
         RunSelector selector = getSelector(context);
@@ -94,7 +94,7 @@ public class ParameterizedRunSelector extends RunSelector {
      * @return xstream expression.
      */
     @CheckForNull
-    private String resolveParameter(@Nonnull RunSelectorPickContext context) {
+    private String resolveParameter(@Nonnull RunSelectorContext context) {
         if (StringUtils.isBlank(getParameterName())) {
             context.logInfo("Parameter name is not specified");
             return null;

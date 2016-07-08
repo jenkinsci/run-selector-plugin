@@ -27,14 +27,14 @@ import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Job;
 import hudson.model.Run;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
 /**
  * Extension point for enumerating builds to copy artifacts from.
- * Subclasses should override {@link #getNextBuild(Job, RunSelectorPickContext)}.
+ * Subclasses should override {@link #getNextBuild(Job, RunSelectorContext)}.
  * use {@link RunSelectorDescriptor} for its descriptor.
  *
  * @author Alan Harder
@@ -47,7 +47,7 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
      * @throws IOException if an error occurs while performing the operation.
      * @throws InterruptedException if any thread interrupts the current thread.
      */
-    public Run<?, ?> pickBuildToCopyFrom(@Nonnull Job<?,?> job, @Nonnull final RunSelectorPickContext context)
+    public Run<?, ?> pickBuildToCopyFrom(@Nonnull Job<?,?> job, @Nonnull final RunSelectorContext context)
             throws IOException, InterruptedException
     {
         context.setLastMatchBuild(null);
@@ -75,10 +75,10 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
 
     /**
      * Override this method to implement {@link RunSelector}.
-     * Use {@link RunSelectorPickContext#getLastMatchBuild()} to
+     * Use {@link RunSelectorContext#getLastMatchBuild()} to
      * continue enumerating builds.
      * Or you can save the execution state
-     * with {@link RunSelectorPickContext#addExtension(Object)}
+     * with {@link RunSelectorContext#addExtension(Object)}
      *
      * @param job       the job to pick a build from.
      * @param context   context for the current execution of runselector.
@@ -86,7 +86,7 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
      * @throws IOException if an error occurs while performing the operation.
      * @throws InterruptedException if any thread interrupts the current thread.
      */
-    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context)
+    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         // Though this can be protected,
