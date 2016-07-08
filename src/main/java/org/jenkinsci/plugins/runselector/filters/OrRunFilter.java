@@ -41,7 +41,7 @@ public class OrRunFilter extends RunFilter {
     private final List<RunFilter> runFilterList;
     
     /**
-     * @param runFilterList build filters to disjunct
+     * @param runFilterList run filter to disjunct
      */
     @DataBoundConstructor
     public OrRunFilter(@Nonnull List<RunFilter> runFilterList) {
@@ -51,14 +51,14 @@ public class OrRunFilter extends RunFilter {
     /**
      * Convenient constructor.
      * 
-     * @param runFilters build filters to disjunct
+     * @param runFilters run filter to disjunct
      */
     public OrRunFilter(@Nonnull RunFilter... runFilters) {
         this(Arrays.asList(runFilters));
     }
     
     /**
-     * @return build filters to disjunct
+     * @return run filter to disjunct
      */
     @Nonnull
     public List<RunFilter> getRunFilterList() {

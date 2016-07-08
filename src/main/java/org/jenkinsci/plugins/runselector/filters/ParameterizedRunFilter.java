@@ -71,7 +71,7 @@ public class ParameterizedRunFilter extends RunFilter {
     @Override
     public boolean isSelectable(Run<?, ?> candidate, RunSelectorPickContext context) {
         String xml = context.getEnvVars().expand(getParameter());
-        context.logDebug("{0}: Expanded build filters: {1}", getDisplayName(), xml);
+        context.logDebug("{0}: Expanded run filter: {1}", getDisplayName(), xml);
         RunFilter filter = getFilterFromXml(xml);
         if (filter == null) {
             context.logDebug("{0}: No filters is specified", getDisplayName());

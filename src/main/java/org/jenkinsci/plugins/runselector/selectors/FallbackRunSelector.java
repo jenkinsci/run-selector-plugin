@@ -63,8 +63,8 @@ public class FallbackRunSelector extends RunSelector {
         private final RunFilter runFilter;
         
         /**
-         * @param runSelector build selectors
-         * @param runFilter   build filters used with the build selectors
+         * @param runSelector run selector
+         * @param runFilter   run filter used with the run selector
          */
         @DataBoundConstructor
         public Entry(@Nonnull RunSelector runSelector, @Nonnull RunFilter runFilter) {
@@ -73,21 +73,21 @@ public class FallbackRunSelector extends RunSelector {
         }
         
         /**
-         * @param runSelector build selectors
+         * @param runSelector run selector
          */
         public Entry(@Nonnull RunSelector runSelector) {
             this(runSelector, new NoRunFilter());
         }
         
         /**
-         * @return build selectors
+         * @return run selector
          */
         public RunSelector getRunSelector() {
             return runSelector;
         }
         
         /**
-         * @return build filters
+         * @return run filter
          */
         public RunFilter getRunFilter() {
             return runFilter;
@@ -140,7 +140,7 @@ public class FallbackRunSelector extends RunSelector {
     private final List<Entry> entryList;
     
     /**
-     * @param entryList build selectors to try
+     * @param entryList run selector to try
      */
     @DataBoundConstructor
     public FallbackRunSelector(@Nonnull List<Entry> entryList) {
@@ -150,7 +150,7 @@ public class FallbackRunSelector extends RunSelector {
     /**
      * Convenient constructor.
      * 
-     * @param runSelectors build selectors to try
+     * @param runSelectors run selector to try
      */
     public FallbackRunSelector(@Nonnull RunSelector... runSelectors) {
         this(Lists.transform(
@@ -165,7 +165,7 @@ public class FallbackRunSelector extends RunSelector {
     }
 
     /**
-     * @return build selectors to try
+     * @return run selector to try
      */
     public List<Entry> getEntryList() {
         return entryList;

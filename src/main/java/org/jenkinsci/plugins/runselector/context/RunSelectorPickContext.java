@@ -83,7 +83,7 @@ public class RunSelectorPickContext extends RunSelectorCommonContext {
     }
 
     /**
-     * The build picked at the last time (but not matched with the filters).
+     * The build picked at the last time (but not matched with the filter).
      * {@link RunSelector}s should continue the enumeration from this.
      * 
      * @return build picked at the last time

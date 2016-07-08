@@ -49,7 +49,7 @@ public class RunFilterParameter extends SimpleParameterDefinition {
     /**
      * @param name name of the build parameter
      * @param description description of this parameter
-     * @param defaultFilter build filters used as default
+     * @param defaultFilter run filter used as default
      */
     @DataBoundConstructor
     public RunFilterParameter(String name, String description, @CheckForNull RunFilter defaultFilter) {
@@ -58,7 +58,7 @@ public class RunFilterParameter extends SimpleParameterDefinition {
     }
 
     /**
-     * @return build filters used as default
+     * @return run filter used as default
      */
     public RunFilter getDefaultFilter() {
         return defaultFilter;
