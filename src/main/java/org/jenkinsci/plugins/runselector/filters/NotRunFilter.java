@@ -39,7 +39,7 @@ public class NotRunFilter extends RunFilter {
     private final RunFilter runFilter;
     
     /**
-     * @param runFilter build filters to invert
+     * @param runFilter run filter to invert
      */
     @DataBoundConstructor
     public NotRunFilter(@Nonnull RunFilter runFilter) {
@@ -47,7 +47,7 @@ public class NotRunFilter extends RunFilter {
     }
     
     /**
-     * @return build filters to invert
+     * @return run filter to invert
      */
     @Nonnull
     public RunFilter getRunFilter() {

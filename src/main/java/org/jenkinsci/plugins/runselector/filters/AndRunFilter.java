@@ -41,7 +41,7 @@ public class AndRunFilter extends RunFilter {
     private final List<RunFilter> runFilterList;
     
     /**
-     * @param runFilterList build filters to conjunct
+     * @param runFilterList run filter to conjunct
      */
     @DataBoundConstructor
     public AndRunFilter(@Nonnull List<RunFilter> runFilterList) {
@@ -51,14 +51,14 @@ public class AndRunFilter extends RunFilter {
     /**
      * Convenient constructor.
      * 
-     * @param runFilters build filters to conjunct
+     * @param runFilters run filter to conjunct
      */
     public AndRunFilter(@Nonnull RunFilter... runFilters) {
         this(Arrays.asList(runFilters));
     }
     
     /**
-     * @return build filters to conjunct
+     * @return run filter to conjunct
      */
     @Nonnull
     public List<RunFilter> getRunFilterList() {

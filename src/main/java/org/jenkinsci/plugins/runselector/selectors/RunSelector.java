@@ -63,7 +63,7 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
             RunFilter filter = context.getRunFilter();
             if (!filter.isSelectable(candidate, context)) {
                 context.logDebug(
-                        "{0}: declined by the filters {1}",
+                        "{0}: declined by the filter {1}",
                         candidate.getFullDisplayName(),
                         filter.getDisplayName()
                 );
@@ -83,7 +83,7 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
      *
      * @param job       the job to pick a build from.
      * @param context   context for the current execution of runselector.
-     * @return  the build matches this selectors.
+     * @return  the build matches this selector.
      * @throws IOException if an error occurs while performing the operation.
      * @throws InterruptedException if any thread interrupts the current thread.
      */
@@ -96,11 +96,11 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
     }
 
     /**
-     * Returns the display name for this selectors.
-     * You can override this to output configurations of this selectors
+     * Returns the display name for this selector.
+     * You can override this to output configurations of this selector
      * in verbose logs.
      *
-     * @return the display name for this selectors.
+     * @return the display name for this selector.
      */
     public String getDisplayName() {
         try {
