@@ -1,0 +1,315 @@
+/*
+ * The MIT License
+ * 
+ * Copyright (c) 2015 IKEDA Yasuyuki
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package org.jenkinsci.plugins.runselector;
+
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.ParameterDefinition;
+import hudson.model.ParametersAction;
+import hudson.model.ParametersDefinitionProperty;
+import hudson.model.StringParameterDefinition;
+import hudson.model.StringParameterValue;
+import hudson.tasks.ArtifactArchiver;
+import hudson.util.IOUtils;
+import jenkins.util.VirtualFile;
+import org.jenkinsci.plugins.runselector.selectors.ParameterizedRunSelector;
+import org.jenkinsci.plugins.runselector.testutils.CopyArtifactUtil;
+import org.jenkinsci.plugins.runselector.testutils.FileWriteBuilder;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.JenkinsRule;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for {@link ParameterizedRunSelector}
+ * 
+ * @see CopyArtifactTest#testParameterizedRunSelector()
+ */
+@Ignore
+public class ParameterizedRunSelectorTest {
+    @ClassRule
+    public static JenkinsRule j = new JenkinsRule();
+    
+    private WorkflowJob createWorkflowJob() throws IOException {
+        return j.jenkins.createProject(WorkflowJob.class, "test"+j.jenkins.getItems().size());
+    }
+
+    /**
+     * Should not cause a fatal error even for an undefined variable.
+     * 
+     * @throws Exception
+     */
+    @Issue("JENKINS-30357")
+    @Test
+    public void testUndefinedParameter() throws Exception {
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        FreeStyleProject copier = j.createFreeStyleProject();
+        
+        ParameterizedRunSelector pbs = new ParameterizedRunSelector("NosuchVariable");
+        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
+                copiee.getFullName(),
+                null,   // parameters
+                pbs,
+                "**/*", // filters
+                "",     // excludes
+                false,  // flatten
+                true,   // optional
+                false   // finterprintArtifacts
+        ));
+        FreeStyleBuild b = copier.scheduleBuild2(0).get();
+        j.assertBuildStatusSuccess(b);
+    }
+    
+    /**
+     * Also applicable for workflow jobs.
+     * 
+     * @throws Exception
+     */
+    @Issue("JENKINS-30357")
+    @Test
+    public void testWorkflow() throws Exception {
+        // Prepare an artifact to be copied.
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        copiee.getBuildersList().add(new FileWriteBuilder("artifact.txt", "foobar"));
+        copiee.getPublishersList().add(new ArtifactArchiver("artifact.txt"));
+        j.assertBuildStatusSuccess(copiee.scheduleBuild2(0));
+
+        WorkflowJob copier = createWorkflowJob();
+        ParameterDefinition paramDef = new StringParameterDefinition("SELECTOR", "<StatusRunSelector><stable>true</stable></StatusRunSelector>");
+        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
+        copier.addProperty(paramsDef);
+        copier.setDefinition(new CpsFlowDefinition(
+            String.format(
+                "node {"
+                    + "step([$class: 'RunSelector',"
+                        + "projectName: '%1$s',"
+                        + "filters: '**/*',"
+                        + "selectors: [$class: 'ParameterizedRunSelector', parameterName: 'SELECTOR'],"
+                    + "]);"
+                    + "step([$class: 'ArtifactArchiver', artifacts: '**/*']);"
+                + "}",
+                copiee.getFullName()
+            ),
+            true
+        ));
+        
+        WorkflowRun b = j.assertBuildStatusSuccess(copier.scheduleBuild2(
+                0,
+                null,
+                new ParametersAction(new StringParameterValue(
+                        "SELECTOR",
+                        "<StatusRunSelector><stable>true</stable></StatusRunSelector>"
+                ))
+        ));
+        
+        VirtualFile vf = b.getArtifactManager().root().child("artifact.txt");
+        assertEquals("foobar", IOUtils.toString(vf.open()));
+    }
+    
+    /**
+     * Should not cause a fatal error even for a broken selectors.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testBrokenParameter() throws Exception {
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        FreeStyleProject copier = j.createFreeStyleProject();
+        
+        ParameterizedRunSelector pbs = new ParameterizedRunSelector("SELECTOR");
+        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
+                copiee.getFullName(),
+                null,   // parameters
+                pbs,
+                "**/*", // filters
+                "",     // excludes
+                false,  // flatten
+                true,   // optional
+                false   // finterprintArtifacts
+        ));
+        FreeStyleBuild b = (FreeStyleBuild) copier.scheduleBuild2(
+                0,
+                new ParametersAction(
+                    new StringParameterValue("SELECTOR", "<SomeBrokenSelector")
+                )
+        ).get();
+        j.assertBuildStatusSuccess(b);
+    }
+    
+    /**
+     * Should not cause a fatal error even for an unavailable selectors.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testUnavailableSelector() throws Exception {
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        FreeStyleProject copier = j.createFreeStyleProject();
+        
+        ParameterizedRunSelector pbs = new ParameterizedRunSelector("SELECTOR");
+        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
+                copiee.getFullName(),
+                null,   // parameters
+                pbs,
+                "**/*", // filters
+                "",     // excludes
+                false,  // flatten
+                true,   // optional
+                false   // finterprintArtifacts
+        ));
+        FreeStyleBuild b = (FreeStyleBuild) copier.scheduleBuild2(
+                0,
+                new ParametersAction(
+                    new StringParameterValue("SELECTOR", "<NoSuchSelector />")
+                )
+        ).get();
+        j.assertBuildStatusSuccess(b);
+    }
+    
+    
+    /**
+     * Should not cause a fatal error even for an empty selectors.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testEmptySelector() throws Exception {
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        FreeStyleProject copier = j.createFreeStyleProject();
+        
+        ParameterizedRunSelector pbs = new ParameterizedRunSelector("SELECTOR");
+        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
+                copiee.getFullName(),
+                null,   // parameters
+                pbs,
+                "**/*", // filters
+                "",     // excludes
+                false,  // flatten
+                true,   // optional
+                false   // finterprintArtifacts
+        ));
+        FreeStyleBuild b = (FreeStyleBuild) copier.scheduleBuild2(
+                0,
+                new ParametersAction(
+                    new StringParameterValue("SELECTOR", "")
+                )
+        ).get();
+        j.assertBuildStatusSuccess(b);
+    }
+    
+    /**
+     * Also accepts immediate value.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testImmediateValue() throws Exception {
+        // Prepare an artifact to be copied.
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        copiee.getBuildersList().add(new FileWriteBuilder("artifact.txt", "foobar"));
+        copiee.getPublishersList().add(new ArtifactArchiver("artifact.txt"));
+        j.assertBuildStatusSuccess(copiee.scheduleBuild2(0));
+
+        WorkflowJob copier = createWorkflowJob();
+        ParameterDefinition paramDef = new StringParameterDefinition("SELECTOR", "<StatusRunSelector><stable>true</stable></StatusRunSelector>");
+        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
+        copier.addProperty(paramsDef);
+        copier.setDefinition(new CpsFlowDefinition(
+            String.format(
+                "node {"
+                    + "step([$class: 'RunSelector',"
+                        + "projectName: '%1$s',"
+                        + "filters: '**/*',"
+                        + "selectors: [$class: 'ParameterizedRunSelector', parameterName: '${SELECTOR}'],"
+                    + "]);"
+                    + "step([$class: 'ArtifactArchiver', artifacts: '**/*']);"
+                + "}",
+                copiee.getFullName()
+            ),
+            true
+        ));
+        
+        WorkflowRun b = j.assertBuildStatusSuccess(copier.scheduleBuild2(
+                0,
+                null,
+                new ParametersAction(new StringParameterValue(
+                        "SELECTOR",
+                        "<StatusRunSelector><stable>true</stable></StatusRunSelector>"
+                ))
+        ));
+        
+        VirtualFile vf = b.getArtifactManager().root().child("artifact.txt");
+        assertEquals("foobar", IOUtils.toString(vf.open()));
+    }
+    
+    
+    /**
+     * Also accepts variable expression.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testVariableExpression() throws Exception {
+        // Prepare an artifact to be copied.
+        FreeStyleProject copiee = j.createFreeStyleProject();
+        copiee.getBuildersList().add(new FileWriteBuilder("artifact.txt", "foobar"));
+        copiee.getPublishersList().add(new ArtifactArchiver("artifact.txt"));
+        j.assertBuildStatusSuccess(copiee.scheduleBuild2(0));
+        
+        FreeStyleProject copier = j.createFreeStyleProject();
+        ParameterDefinition paramDef = new StringParameterDefinition("SELECTOR", "<StatusRunSelector><stable>true</stable></StatusRunSelector>");
+        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
+        copier.addProperty(paramsDef);
+        ParameterizedRunSelector pbs = new ParameterizedRunSelector("${SELECTOR}");
+        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
+                copiee.getFullName(),
+                null,   // parameters
+                pbs,
+                "**/*", // filters
+                "",     // excludes
+                false,  // flatten
+                false,  // optional
+                false   // finterprintArtifacts
+        ));
+        FreeStyleBuild b = j.assertBuildStatusSuccess((FreeStyleBuild)copier.scheduleBuild2(
+                0,
+                new ParametersAction(new StringParameterValue(
+                        "SELECTOR",
+                        "<StatusRunSelector><stable>true</stable></StatusRunSelector>"
+                ))
+        ).get());
+        
+        assertEquals("foobar", b.getWorkspace().child("artifact.txt").readToString());
+    }
+    
+}
