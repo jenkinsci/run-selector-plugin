@@ -248,7 +248,7 @@ public class CopyArtifact20Test {
 
         RunSelector ca = new RunSelector(copiee.getFullName());
 
-        RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+        RunSelectorPickResult r = ca.select(selectors, context);
         assertEquals(RunSelectorPickResult.Result.Found, r.result);
         assertEquals(copiee.getFullName(), r.getJob().getFullName());
         assertEquals(copieeBuild.getId(), r.getBuild().getId());
@@ -274,7 +274,7 @@ public class CopyArtifact20Test {
 
         RunSelector ca = new RunSelector(copiee.getFullName());
 
-        RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+        RunSelectorPickResult r = ca.select(selectors, context);
         assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
         assertEquals(copiee.getFullName(), r.getJob().getFullName());
     }
@@ -301,7 +301,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -332,7 +332,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -363,7 +363,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -393,7 +393,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -420,7 +420,7 @@ public class CopyArtifact20Test {
 
         RunSelector ca = new RunSelector("nosuchproject");
 
-        RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+        RunSelectorPickResult r = ca.select(selectors, context);
         assertEquals(RunSelectorPickResult.Result.ProjectNotFound, r.result);
     }
 
@@ -449,7 +449,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.ProjectNotFound, r.result);
         } finally {
             j.jenkins.setSecurityRealm(null);

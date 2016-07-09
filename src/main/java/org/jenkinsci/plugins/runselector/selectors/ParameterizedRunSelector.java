@@ -67,9 +67,9 @@ public class ParameterizedRunSelector extends RunSelector {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public Run<?, ?> pickBuildToCopyFrom(Job<?, ?> job, RunSelectorContext context)
+    @CheckForNull
+    public Run<?, ?> select(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         RunSelector selector = getSelector(context);
@@ -77,7 +77,7 @@ public class ParameterizedRunSelector extends RunSelector {
             context.logInfo("No selectors was resolved.");
             return null;
         }
-        return selector.pickBuildToCopyFrom(job, context);
+        return selector.select(job, context);
     }
 
     /**

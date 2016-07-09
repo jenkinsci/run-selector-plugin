@@ -98,7 +98,8 @@ public class StatusRunSelector extends RunSelector {
      * {@inheritDoc}
      */
     @Override
-    public Run<?, ?> getNextBuild(Job<?, ?> job, RunSelectorContext context) {
+    @CheckForNull
+    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
         Run<?, ?> previousBuild = context.getLastMatchBuild();
         if (previousBuild == null) {
             // the first time

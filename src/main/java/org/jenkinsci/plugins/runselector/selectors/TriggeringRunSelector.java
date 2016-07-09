@@ -269,7 +269,6 @@ public class TriggeringRunSelector extends RunSelector {
         /**
          * ctor
          */
-        @SuppressWarnings("deprecation")
         public DescriptorImpl() {
             load();
         }
