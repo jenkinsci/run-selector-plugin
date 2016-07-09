@@ -30,6 +30,7 @@ import hudson.model.PermalinkProjectAction.Permalink;
 import hudson.model.Run;
 import hudson.util.ComboBoxModel;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;

@@ -24,6 +24,7 @@
 package org.jenkinsci.plugins.runselector.selectors;
 
 import org.jenkinsci.plugins.runselector.RunSelector;
+import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jvnet.localizer.Localizable;
 
 /**

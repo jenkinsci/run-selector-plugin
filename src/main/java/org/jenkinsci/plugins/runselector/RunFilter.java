@@ -32,7 +32,6 @@ import hudson.model.Run;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
-import org.jenkinsci.plugins.runselector.filters.RunFilterDescriptor;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

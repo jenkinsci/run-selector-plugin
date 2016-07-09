@@ -22,21 +22,27 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.runselector.filters;
+package org.jenkinsci.plugins.runselector;
 
 import hudson.model.Descriptor;
-import org.jenkinsci.plugins.runselector.RunFilter;
-
-import java.util.List;
 
 /**
- * Descriptor for {@link RunFilter}
+ * Descriptor for {@link RunSelector}.
+ * Be aware that {@link RunSelector} in the old scheme might not use this.
  */
-public abstract class RunFilterDescriptor extends Descriptor<RunFilter> {
+public abstract class RunSelectorDescriptor extends Descriptor<RunSelector> {
     /**
-     * @return descriptors of all {@link RunFilter}
+     * 
      */
-    public List<RunFilterDescriptor> getDescriptorList() {
-        return RunFilter.all();
+    public RunSelectorDescriptor() {
+        super();
+    }
+    
+    /**
+     * @param clazz class to describe
+     * @see Descriptor#Descriptor(Class)
+     */
+    public RunSelectorDescriptor(Class<? extends RunSelector> clazz) {
+        super(clazz);
     }
 }
