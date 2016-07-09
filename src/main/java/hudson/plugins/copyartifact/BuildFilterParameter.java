@@ -24,26 +24,21 @@
 
 package hudson.plugins.copyartifact;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import jenkins.model.Jenkins;
-import net.sf.json.JSONObject;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
-import hudson.model.Descriptor;
 import hudson.model.ParameterValue;
 import hudson.model.SimpleParameterDefinition;
 import hudson.model.StringParameterValue;
 import hudson.plugins.copyartifact.filter.NoBuildFilter;
 import hudson.plugins.copyartifact.filter.ParameterizedBuildFilter;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * Build parameter used with {@link ParameterizedBuildFilter}
@@ -101,26 +96,7 @@ public class BuildFilterParameter extends SimpleParameterDefinition {
         public String getDisplayName() {
             return Messages.BuildFilterParameter_DisplayName();
         }
-        
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getHelpFile(String fieldName) {
-            if ("defaultFilter".equals(fieldName) || "parameter".equals(fieldName)) {
-                // Display the help file of `Copyartifact#getFilter` ("Build filter" field)
-                // for `defaultFilter` ("Default Filter" field) in project configuration pages
-                // and the value of build parameter ("Build filter for Copy Artifact" field)
-                // in "This build requires parameters" pages.
-                Jenkins jenkins = Jenkins.getInstance();
-                Descriptor<?> d = (jenkins == null)?null:jenkins.getDescriptor(CopyArtifact.class);
-                if (d != null) {
-                    return d.getHelpFile("buildFilter");
-                }
-            }
-            return super.getHelpFile(fieldName);
-        }
-        
+
         /**
          * @return descriptors of all {@link BuildFilter}s except {@link BuildFilterParameter}
          */

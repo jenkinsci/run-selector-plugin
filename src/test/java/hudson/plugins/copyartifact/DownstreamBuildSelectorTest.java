@@ -60,6 +60,7 @@ import org.acegisecurity.context.SecurityContextHolder;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -70,6 +71,7 @@ import com.google.common.collect.Sets;
 /**
  *
  */
+@Ignore
 public class DownstreamBuildSelectorTest {
     @Rule
     public JenkinsRule j = new JenkinsRule();
@@ -119,6 +121,7 @@ public class DownstreamBuildSelectorTest {
     }
     */
     
+/*
     @Test
     public void testPerformSuccess() throws Exception {
         FreeStyleProject upstream = j.createFreeStyleProject();
@@ -143,7 +146,7 @@ public class DownstreamBuildSelectorTest {
                             false,
                             TriggeredBuildSelector.UpstreamFilterStrategy.UseNewest
                     ),
-                    "**/*",
+                    "***",
                     "",
                     "",
                     false,
@@ -205,7 +208,7 @@ public class DownstreamBuildSelectorTest {
                             upstream.getFullName(),
                             Integer.toString(upstreamBuild2.getNumber())
                     ),
-                    "**/*",
+                    "**\/*",
                     "",
                     "",
                     false,
@@ -239,7 +242,7 @@ public class DownstreamBuildSelectorTest {
                             "${UPSTREAM_PROJECT_NAME}",
                             "${UPSTREAM_BUILD_NUMBER}"
                     ),
-                    "**/*",
+                    "**\/*",
                     "",
                     "",
                     false,
@@ -276,7 +279,7 @@ public class DownstreamBuildSelectorTest {
                             "${UPSTREAM_PROJECT_NAME}",
                             "${UPSTREAM_BUILD_NUMBER}"
                     ),
-                    "**/*",
+                    "**\/*",
                     "",
                     "",
                     false,
@@ -297,7 +300,9 @@ public class DownstreamBuildSelectorTest {
             assertEquals(downstreamBuild3.getId(), artifact.readToString());
         }
     }
-    
+*/
+
+/*
     @Test
     public void testPerformFailure() throws Exception {
         FreeStyleProject upstream = j.createFreeStyleProject();
@@ -322,7 +327,7 @@ public class DownstreamBuildSelectorTest {
                         TriggeredBuildSelector.UpstreamFilterStrategy.UseNewest,
                         false
                 ),
-                "**/*",
+                "**\/*",
                 "",
                 "",
                 false,
@@ -376,7 +381,7 @@ public class DownstreamBuildSelectorTest {
                         "${UPSTREAM_PROJECT_NAME}",
                         "${UPSTREAM_BUILD_NUMBER}"
                 ),
-                "**/*",
+                "**\/*",
                 "",
                 "",
                 false,
@@ -438,7 +443,9 @@ public class DownstreamBuildSelectorTest {
             assertEquals(Collections.emptyList(), b.getWorkspace().list());
         }
     }
-    
+*/
+
+/*
     @Test
     public void testPerformRelative() throws Exception {
         // folder1/upstream -> folder2/downstream
@@ -473,7 +480,7 @@ public class DownstreamBuildSelectorTest {
                         TriggeredBuildSelector.UpstreamFilterStrategy.UseNewest,
                         false
                 ),
-                "**/*",
+                "**\/*",
                 "",
                 "",
                 false,
@@ -508,7 +515,7 @@ public class DownstreamBuildSelectorTest {
                         "../upstream",
                         Integer.toString(upstreamBuild.getNumber())
                 ),
-                "**/*",
+                "**\/*",
                 "",
                 "",
                 false,
@@ -525,7 +532,8 @@ public class DownstreamBuildSelectorTest {
         assertTrue(artifact.exists());
         assertEquals(downstreamBuild.getId(), artifact.readToString());
     }
-    
+*/
+
     /* TODO: Move to DownstreamBuildFilterTest
     @Test
     public void testCheckUpstreamProjectName() throws Exception {
@@ -736,6 +744,7 @@ public class DownstreamBuildSelectorTest {
     }
     */
     
+/*
     @Test
     public void testUpstreamIsWorkflow() throws Exception {
         WorkflowJob upstream = j.jenkins.createProject(WorkflowJob.class, "upstream");
@@ -770,7 +779,7 @@ public class DownstreamBuildSelectorTest {
                         upstream.getFullName(),
                         Integer.toString(upstreamBuild.getNumber())
                 ),
-                "**/*",
+                "**\/*",
                 "",
                 "",
                 false,
@@ -783,7 +792,9 @@ public class DownstreamBuildSelectorTest {
         // to see expected log is recorded.
         //System.out.println(b.getLog());
     }
-    
+*/
+
+/*
     @Test
     public void testDownstreamIsWorkflow() throws Exception {
         FreeStyleProject upstream = j.createFreeStyleProject();
@@ -815,7 +826,7 @@ public class DownstreamBuildSelectorTest {
                         upstream.getFullName(),
                         Integer.toString(upstreamBuild.getNumber())
                 ),
-                "**/*",
+                "**\/*",
                 "",
                 "",
                 false,
@@ -828,4 +839,5 @@ public class DownstreamBuildSelectorTest {
         // to see expected log is recorded.
         //System.out.println(b.getLog());
     }
+*/
 }

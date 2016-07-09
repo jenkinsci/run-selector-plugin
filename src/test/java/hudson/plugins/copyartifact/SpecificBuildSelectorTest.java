@@ -7,6 +7,7 @@ import hudson.model.ParametersAction;
 import hudson.model.Run;
 import hudson.model.StringParameterValue;
 import hudson.plugins.copyartifact.testutils.CopyArtifactUtil;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.CaptureEnvironmentBuilder;
@@ -15,6 +16,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class SpecificBuildSelectorTest {
     @Rule
     public final JenkinsRule rule = new JenkinsRule();

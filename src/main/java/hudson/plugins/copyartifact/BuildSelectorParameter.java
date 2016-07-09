@@ -23,12 +23,10 @@
  */
 package hudson.plugins.copyartifact;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Logger;
-
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStreamException;
-import jenkins.model.Jenkins;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.Descriptor;
@@ -36,13 +34,14 @@ import hudson.model.ParameterValue;
 import hudson.model.SimpleParameterDefinition;
 import hudson.model.StringParameterValue;
 import hudson.util.XStream2;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Alan Harder
@@ -125,27 +124,10 @@ public class BuildSelectorParameter extends SimpleParameterDefinition {
                     }
             ));
         }
-        
-        @Override
-        public String getHelpFile(String fieldName) {
-            if ("defaultSelector".equals(fieldName) || "parameter".equals(fieldName)) {
-                // Display the help file of `Copyartifact#getSelector` ("which build" field)
-                // for `defaultSelector` ("Default Selector" field) in project configuration pages
-                // and the value of build parameter ("Build selector for Copy Artifact" field)
-                // in "This build requires parameters" pages.
-                Jenkins jenkins = Jenkins.getInstance();
-                Descriptor<?> d = (jenkins == null)?null:jenkins.getDescriptor(CopyArtifact.class);
-                if (d != null) {
-                    return d.getHelpFile("selector");
-                }
-            }
-            return super.getHelpFile(fieldName);
-        }
     }
 
     private static final XStream2 XSTREAM = new XStream2();
 
-    @SuppressWarnings("deprecation")
     static void initAliases() {
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins == null) {
@@ -155,11 +137,5 @@ public class BuildSelectorParameter extends SimpleParameterDefinition {
         // Alias all BuildSelectors to their simple names
         for (Descriptor<BuildSelector> d : jenkins.getDescriptorByType(DescriptorImpl.class).getBuildSelectors())
             XSTREAM.alias(d.clazz.getSimpleName(), d.clazz);
-        
-        // For backward compatibilities
-        XSTREAM.alias("DownstreamBuildSelector", DownstreamBuildSelector.class);
-        XSTREAM.alias("LastCompletedBuildSelector", LastCompletedBuildSelector.class);
-        XSTREAM.alias("SavedBuildSelector", SavedBuildSelector.class);
-        XSTREAM.alias("WorkspaceBuildSelector", WorkspaceSelector.class);
     }
 }

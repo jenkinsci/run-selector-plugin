@@ -23,20 +23,9 @@
  */
 package hudson.plugins.copyartifact.selector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import hudson.Extension;
-import hudson.model.AbstractProject;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Cause;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.Job;
@@ -44,12 +33,20 @@ import hudson.model.Run;
 import hudson.plugins.copyartifact.BuildSelector;
 import hudson.plugins.copyartifact.BuildSelectorDescriptor;
 import hudson.plugins.copyartifact.CopyArtifactPickContext;
-import hudson.plugins.copyartifact.TriggeredBuildSelector;
 import net.sf.json.JSONObject;
-
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copy artifacts from the build that triggered this build.
@@ -262,8 +259,6 @@ public class TriggeringBuildSelector extends BuildSelector {
          */
         @SuppressWarnings("deprecation")
         public DescriptorImpl() {
-            globalUpstreamFilterStrategy = TriggeredBuildSelector.DESCRIPTOR
-                .getGlobalUpstreamFilterStrategy().getOrigin();
             load();
         }
         

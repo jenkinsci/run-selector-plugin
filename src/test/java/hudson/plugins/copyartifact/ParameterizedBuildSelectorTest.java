@@ -45,6 +45,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -54,6 +55,7 @@ import org.jvnet.hudson.test.JenkinsRule;
  * 
  * @see CopyArtifactTest#testParameterizedBuildSelector()
  */
+@Ignore
 public class ParameterizedBuildSelectorTest {
     @ClassRule
     public static JenkinsRule j = new JenkinsRule();
