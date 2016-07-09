@@ -29,6 +29,8 @@ import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStreamException;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
 import hudson.model.Descriptor;
 import hudson.model.ParameterValue;
 import hudson.model.SimpleParameterDefinition;
@@ -129,7 +131,8 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
 
     private static final XStream2 XSTREAM = new XStream2();
 
-    static void initAliases() {
+    @Initializer(after = InitMilestone.PLUGINS_STARTED)
+    public static void initAliases() {
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins == null) {
             LOGGER.severe("Called for initialization but Jenkins instance no longer available.");
