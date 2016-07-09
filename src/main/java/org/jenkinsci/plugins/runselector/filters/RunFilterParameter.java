@@ -33,6 +33,7 @@ import hudson.model.SimpleParameterDefinition;
 import hudson.model.StringParameterValue;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.runselector.RunFilter;
+import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 

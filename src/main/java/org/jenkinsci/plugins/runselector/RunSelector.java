@@ -28,7 +28,6 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Job;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
-import org.jenkinsci.plugins.runselector.selectors.RunSelectorDescriptor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
