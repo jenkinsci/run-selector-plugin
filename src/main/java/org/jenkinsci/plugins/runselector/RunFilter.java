@@ -21,15 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.runselector.filters;
+package org.jenkinsci.plugins.runselector;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
+import org.jenkinsci.plugins.runselector.filters.RunFilterDescriptor;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -37,11 +40,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Additional filters used by RunSelector.
+ * Additional filters used by {@link RunSelector}.
  * Use {@link RunFilterDescriptor} for its descriptor.
  * @author Alan Harder
  */
-public class RunFilter extends AbstractDescribableImpl<RunFilter> {
+public class RunFilter extends AbstractDescribableImpl<RunFilter> implements ExtensionPoint {
 
     /**
      * @param candidate the build to check
@@ -49,7 +52,6 @@ public class RunFilter extends AbstractDescribableImpl<RunFilter> {
      * @return whether this build can be selected.
      */
     public boolean isSelectable(@Nonnull Run<?, ?> candidate, @Nonnull RunSelectorPickContext context) {
-        // for backward compatibility.
         return true;
     }
     

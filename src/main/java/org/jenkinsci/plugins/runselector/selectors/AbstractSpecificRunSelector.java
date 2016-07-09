@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.model.Job;
 import hudson.model.Run;
+import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 
 import javax.annotation.CheckForNull;

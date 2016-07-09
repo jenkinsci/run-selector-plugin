@@ -25,6 +25,7 @@ package org.jenkinsci.plugins.runselector.filters;
 
 import hudson.Extension;
 import hudson.model.Run;
+import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 

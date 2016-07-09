@@ -24,8 +24,7 @@
 package org.jenkinsci.plugins.runselector.testutils;
 
 import hudson.tasks.Builder;
-import org.jenkinsci.plugins.runselector.selectors.RunSelector;
-//import hudson.plugins.runselector.RunSelector;
+import org.jenkinsci.plugins.runselector.RunSelector;
 
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>

@@ -28,6 +28,7 @@ import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.PermalinkProjectAction;
 import hudson.model.Run;
+import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 

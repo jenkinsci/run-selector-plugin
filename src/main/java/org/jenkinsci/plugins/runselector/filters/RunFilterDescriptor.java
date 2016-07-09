@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.runselector.filters;
 
 import hudson.model.Descriptor;
+import org.jenkinsci.plugins.runselector.RunFilter;
 
 import java.util.List;
 
