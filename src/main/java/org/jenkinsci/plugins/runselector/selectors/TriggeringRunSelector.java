@@ -36,6 +36,7 @@ import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.CheckForNull;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Copy artifacts from the build that triggered this build.
+ * Select the build that triggered this build.
  * @author Alan Harder
  */
 public class TriggeringRunSelector extends RunSelector {
@@ -111,24 +112,36 @@ public class TriggeringRunSelector extends RunSelector {
          * enumerated builds.
          */
         public Iterator<Run<?, ?>> nextBuild;
-    };
-    
-    private final UpstreamFilterStrategy upstreamFilterStrategy;
+    }
+
+    @CheckForNull
+    private UpstreamFilterStrategy upstreamFilterStrategy;
     private boolean allowUpstreamDependencies;
+
+    @DataBoundConstructor
+    public TriggeringRunSelector() {
+    }
 
     /**
      * @param upstreamFilterStrategy which build should be used if triggered by multiple upstream builds.
+     */
+    @DataBoundSetter
+    public void setUpstreamFilterStrategy(UpstreamFilterStrategy upstreamFilterStrategy) {
+        this.upstreamFilterStrategy = upstreamFilterStrategy;
+    }
+
+    /**
      * @param allowUpstreamDependencies whether to include upstream dependencies.
      */
-    @DataBoundConstructor
-    public TriggeringRunSelector(UpstreamFilterStrategy upstreamFilterStrategy, boolean allowUpstreamDependencies) {
-        this.upstreamFilterStrategy = upstreamFilterStrategy;
+    @DataBoundSetter
+    public void setAllowUpstreamDependencies(boolean allowUpstreamDependencies) {
         this.allowUpstreamDependencies = allowUpstreamDependencies;
     }
 
     /**
      * @return Which build should be used if triggered by multiple upstream builds.
      */
+    @CheckForNull
     public UpstreamFilterStrategy getUpstreamFilterStrategy() {
         return upstreamFilterStrategy;
     }

@@ -37,11 +37,11 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /**
- * Copy artifacts from the specific status build.
+ * Select build based on the specific status build.
  * @author Alan Harder
  */
 public class StatusRunSelector extends RunSelector {
-    public static enum BuildStatus {
+    public enum BuildStatus {
         /** Stable builds.*/
         Stable(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Stable()),
 
@@ -58,25 +58,24 @@ public class StatusRunSelector extends RunSelector {
         Completed(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Completed()),
 
         /** Any builds including incomplete (running) ones.*/
-        Any(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Any()),
+        Any(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Any());
 
-        ;
         private final Localizable displayName;
-        private BuildStatus(Localizable displayName) {
+
+        BuildStatus(Localizable displayName) {
             this.displayName = displayName;
         }
 
         public String getDisplayName() {
             return displayName.toString();
         }
-    };
-
+    }
 
     @Nonnull
     private final BuildStatus buildStatus;
 
     public StatusRunSelector() {
-        this(null);
+        this(BuildStatus.Stable);
     }
 
     /**
@@ -84,12 +83,13 @@ public class StatusRunSelector extends RunSelector {
      */
     @DataBoundConstructor
     public StatusRunSelector(@CheckForNull BuildStatus buildStatus) {
-        this.buildStatus = (buildStatus != null)?buildStatus:BuildStatus.Stable;
+        this.buildStatus = buildStatus != null ? buildStatus : BuildStatus.Stable;
     }
 
     /**
      * @return build status to select
      */
+    @Nonnull
     public BuildStatus getBuildStatus() {
         return buildStatus;
     }

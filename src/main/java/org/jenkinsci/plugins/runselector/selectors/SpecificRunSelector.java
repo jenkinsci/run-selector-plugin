@@ -24,6 +24,7 @@
 package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.PermalinkProjectAction;
@@ -37,18 +38,20 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 
 /**
- * Copy artifacts from a specific build.
+ * Select a specific build.
  * @author Alan Harder
  */
 public class SpecificRunSelector extends AbstractSpecificRunSelector {
 
+    @Nonnull
     private final String buildNumber;
 
     @DataBoundConstructor
     public SpecificRunSelector(String buildNumber) {
-        this.buildNumber = buildNumber;
+        this.buildNumber = Util.fixNull(buildNumber).trim();
     }
 
+    @Nonnull
     public String getBuildNumber() {
         return buildNumber;
     }

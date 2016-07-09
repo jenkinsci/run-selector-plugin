@@ -31,7 +31,7 @@ import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * Copy artifacts from the saved build (marked "keep forever").
+ * Select the saved build (marked "keep forever").
  * @author Alan Harder
  */
 public class SavedRunFilter extends RunFilter {
