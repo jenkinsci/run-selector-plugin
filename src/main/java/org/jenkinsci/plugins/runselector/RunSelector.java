@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.runselector.selectors;
+package org.jenkinsci.plugins.runselector;
 
 import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Job;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
-import org.jenkinsci.plugins.runselector.filters.RunFilter;
+import org.jenkinsci.plugins.runselector.selectors.RunSelectorDescriptor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;

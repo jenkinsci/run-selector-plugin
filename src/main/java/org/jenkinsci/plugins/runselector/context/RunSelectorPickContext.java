@@ -25,8 +25,8 @@
 package org.jenkinsci.plugins.runselector.context;
 
 import hudson.model.Run;
-import org.jenkinsci.plugins.runselector.filters.RunFilter;
-import org.jenkinsci.plugins.runselector.selectors.RunSelector;
+import org.jenkinsci.plugins.runselector.RunFilter;
+import org.jenkinsci.plugins.runselector.RunSelector;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;

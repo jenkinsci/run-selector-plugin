@@ -31,6 +31,7 @@ import hudson.model.Cause.UpstreamCause;
 import hudson.model.Job;
 import hudson.model.Run;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;

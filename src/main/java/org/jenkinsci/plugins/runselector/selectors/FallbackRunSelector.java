@@ -34,10 +34,11 @@ import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.runselector.RunFilter;
+import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
 import org.jenkinsci.plugins.runselector.filters.AndRunFilter;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
-import org.jenkinsci.plugins.runselector.filters.RunFilter;
 import org.jenkinsci.plugins.runselector.filters.RunFilterDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 

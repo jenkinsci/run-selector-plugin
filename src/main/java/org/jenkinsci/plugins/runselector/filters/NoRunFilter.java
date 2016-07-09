@@ -24,6 +24,7 @@
 
 package org.jenkinsci.plugins.runselector.filters;
 
+import org.jenkinsci.plugins.runselector.RunFilter;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**

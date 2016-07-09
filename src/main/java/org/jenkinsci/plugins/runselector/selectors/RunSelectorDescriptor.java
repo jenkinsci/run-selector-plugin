@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.model.Descriptor;
+import org.jenkinsci.plugins.runselector.RunSelector;
 
 /**
  * Descriptor for {@link RunSelector}.
