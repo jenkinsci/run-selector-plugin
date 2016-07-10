@@ -25,14 +25,19 @@
 package org.jenkinsci.plugins.runselector.context;
 
 import hudson.EnvVars;
+import hudson.model.AbstractBuild;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunSelector;
+import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -43,36 +48,67 @@ import java.util.logging.Logger;
 
 /**
  * Context for an execution of runselector.
- * This allows us to adding new fields without affecting
- * existing plugins.
- *
- * You can manage plugin specific informations using
+ * This allows us to adding new fields without affecting existing plugins.
+ * <p>
+ * You can manage plugin specific information using
  * {@link #addExtension(Object)} and {@link #getExtension(Class)}.
  */
 public class RunSelectorContext implements Cloneable {
+
     private static final Logger LOGGER = Logger.getLogger(RunSelectorContext.class.getName());
-    private Jenkins jenkins;
-    private Run<?, ?> currentRun;
-    private TaskListener listener;
+
+    @Nonnull
+    private final Jenkins jenkins;
+    @Nonnull
+    private final Run<?, ?> build;
+    @Nonnull
+    private final TaskListener listener;
+    @Nonnull
     private EnvVars envVars;
-    private boolean verbose;
-    private String projectName;
+    @Nonnull
     private RunFilter runFilter;
-    private Run<?,?> lastMatchBuild;
+    @Nonnull
     private List<Object> extensionList;
+    @CheckForNull
+    private Run<?, ?> lastMatchBuild;
+
+    private boolean verbose;
 
     /**
-     * @param jenkins Jenkins instance.
+     * Creates a new {@link RunSelectorContext} with {@link NoRunFilter}.
+     *
+     * @param jenkins  the Jenkins instance
+     * @param build    the build running runselector
+     * @param listener listener for the build running runselector
      */
-    public void setJenkins(@Nonnull Jenkins jenkins) {
-        this.jenkins = jenkins;
+    public RunSelectorContext(@Nonnull Jenkins jenkins, @Nonnull Run<?, ?> build, @Nonnull TaskListener listener)
+            throws IOException, InterruptedException {
+
+        this(jenkins, build, listener, new NoRunFilter());
     }
 
     /**
-     * Returns {@link Jenkins} instance.
-     * Never be <code>null</code>.
+     * Creates a new {@link RunSelectorContext}.
      *
-     * @return Jenkins instance.
+     * @param jenkins  the Jenkins instance
+     * @param build    the build running runselector
+     * @param listener listener for the build running runselector
+     */
+    public RunSelectorContext(@Nonnull Jenkins jenkins, @Nonnull Run<?, ?> build, @Nonnull TaskListener listener,
+                              @Nonnull RunFilter runFilter)
+            throws IOException, InterruptedException {
+
+        this.jenkins = jenkins;
+        this.build = build;
+        this.listener = listener;
+        this.runFilter = runFilter;
+
+        this.envVars = constructEnvVars();
+        this.extensionList = new ArrayList<Object>();
+    }
+
+    /**
+     * @return the Jenkins instance
      */
     @Nonnull
     public Jenkins getJenkins() {
@@ -80,53 +116,23 @@ public class RunSelectorContext implements Cloneable {
     }
 
     /**
-     * @param currentRun the build running runselector
-     */
-    public void setCurrentRun(@Nonnull Run<?, ?> currentRun) {
-        this.currentRun = currentRun;
-    }
-
-    /**
      * @return the build running runselector
      */
     @Nonnull
-    public Run<?, ?> getCurrentRun() {
-        return currentRun;
+    public Run<?, ?> getBuild() {
+        return build;
     }
 
     /**
-     * @param listener listener for the build running runselector.
+     * @return the listener for the build running runselector
      */
-    public void setListener(TaskListener listener) {
-        this.listener = listener;
-    }
-
-    /**
-     * @return the listener for the build running runselector.
-     */
+    @Nonnull
     public TaskListener getListener() {
         return listener;
     }
 
     /**
-     * Shortcut for <code>getListener().getLogger()</code>
-     *
-     * @return stream to output logs
-     */
-    @Nonnull
-    protected PrintStream getConsole() {
-        return listener.getLogger();
-    }
-
-    /**
-     * @param envVars variables for the current build
-     */
-    public void setEnvVars(@Nonnull EnvVars envVars) {
-        this.envVars = envVars;
-    }
-
-    /**
-     * @return variables for the current build.
+     * @return environment variables for the current build
      */
     @Nonnull
     public EnvVars getEnvVars() {
@@ -134,47 +140,38 @@ public class RunSelectorContext implements Cloneable {
     }
 
     /**
-     * @param verbose whether output verbose (for diagnostics) logs.
+     * Shortcut for {@code getListener().getLogger()}
+     *
+     * @return stream to output logs
+     */
+    @Nonnull
+    public PrintStream getConsole() {
+        return listener.getLogger();
+    }
+
+    /**
+     * @param verbose whether output verbose (for diagnostics) logs
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
     /**
-     * @return whether output verbose (for diagnostics) logs.
+     * @return whether output verbose (for diagnostics) logs
      */
     public boolean isVerbose() {
         return verbose;
     }
 
     /**
-     * @param projectName the project name to copy from.
-     */
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    /**
-     * The project name to copy from.
-     * Be aware that this might be different from the full name of the project
-     * as it might be specified with relative expression.
-     * 
-     * @return the project name to copy from.
-     */
-    @Nonnull
-    public String getProjectName() {
-        return projectName;
-    }
-
-    /**
-     * @param runFilter filters for builds
+     * @param runFilter the filter for builds
      */
     public void setRunFilter(@Nonnull RunFilter runFilter) {
         this.runFilter = runFilter;
     }
 
     /**
-     * @return a filters for builds
+     * @return a filter for builds
      */
     @Nonnull
     public RunFilter getRunFilter() {
@@ -191,7 +188,7 @@ public class RunSelectorContext implements Cloneable {
     /**
      * The build picked at the last time (but not matched with the filter).
      * {@link RunSelector}s should continue the enumeration from this.
-     * 
+     *
      * @return build picked at the last time
      */
     @CheckForNull
@@ -200,7 +197,7 @@ public class RunSelectorContext implements Cloneable {
     }
 
     /**
-     * @return additional informations by plugins.
+     * @return additional information by plugins
      */
     @Nonnull
     public List<Object> getExtensionList() {
@@ -218,7 +215,7 @@ public class RunSelectorContext implements Cloneable {
 
     /**
      * @param extension extension object to remove
-     * @return true if the extension is contained.
+     * @return true if the extension is contained
      */
     public boolean removeExtension(@Nonnull Object extension) {
         return getExtensionList().remove(extension);
@@ -228,7 +225,7 @@ public class RunSelectorContext implements Cloneable {
      * Removes extensions with the same class type before adding.
      *
      * @param extension extension object to replace with
-     * @return true if an extension object of the same class class is contained.
+     * @return true if an extension object of the same class class is contained
      */
     public boolean replaceExtension(@Nonnull Object extension) {
         boolean removed = false;
@@ -247,22 +244,16 @@ public class RunSelectorContext implements Cloneable {
     /**
      * Extract an extension object of the specified class.
      *
-     * @param <T>   specified with <code>klass</code>
-     * @param klass class of the extension to extract
+     * @param <T>   specified with {@code clazz}
+     * @param clazz class of the extension to extract
      * @return extension of the class
      */
     @CheckForNull
-    public <T> T getExtension(@Nonnull Class<T> klass) {
+    public <T> T getExtension(@Nonnull Class<T> clazz) {
         for (Object e : getExtensionList())
-            if (klass.isInstance(e))
-                return klass.cast(e);
+            if (clazz.isInstance(e))
+                return clazz.cast(e);
         return null;
-    }
-
-    /**
-     * ctor
-     */
-    public RunSelectorContext() {
     }
 
     private void log(@Nonnull String message) {
@@ -294,7 +285,7 @@ public class RunSelectorContext implements Cloneable {
     }
 
     /**
-     * Outputs a log message if {@link #isVerbose()} is <code>true</code>.
+     * Outputs a log message if {@link #isVerbose()} is {@code true}
      *
      * @param message message to log
      */
@@ -306,7 +297,7 @@ public class RunSelectorContext implements Cloneable {
 
     /**
      * Outputs a log message in {@link MessageFormat} formats
-     * if {@link #isVerbose()} is <code>true</code>.
+     * if {@link #isVerbose()} is {@code true}
      *
      * @param pattern   pattern for {@link MessageFormat}
      * @param arguments values to format
@@ -320,25 +311,11 @@ public class RunSelectorContext implements Cloneable {
     /**
      * Outputs a log message with an exception
      *
-     * @param string message to log.
-     * @param t      exception to log.
+     * @param string message to log
+     * @param t      exception to log
      */
     public void logException(@Nonnull String string, @Nonnull Throwable t) {
         log(string, t);
-    }
-
-    /**
-     * Creates a new instance copying src data.
-     *
-     * @param src {@link RunSelectorContext} to copy from.
-     */
-    protected RunSelectorContext(@Nonnull RunSelectorContext src) {
-        this.jenkins = src.jenkins;
-        this.currentRun = src.currentRun;
-        this.listener = src.listener;
-        this.envVars = new EnvVars(src.envVars);
-        this.verbose = src.verbose;
-        copyExtensionListFrom(src);
     }
 
     private void copyExtensionListFrom(RunSelectorContext src) {
@@ -367,6 +344,37 @@ public class RunSelectorContext implements Cloneable {
                 this.extensionList.add(ext);
             }
         }
+    }
+
+    /**
+     * Constructs the environment variables for the current build.
+     *
+     * @return the current build environment variables
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private EnvVars constructEnvVars() throws IOException, InterruptedException {
+        EnvVars envVars = build.getEnvironment(listener);
+        if (build instanceof AbstractBuild) {
+            envVars.overrideAll(((AbstractBuild<?, ?>) build).getBuildVariables()); // Add in matrix axes..
+        } else {
+            // Abstract#getEnvironment(TaskListener) put build parameters to
+            // environments, but Run#getEnvironment(TaskListener) doesn't.
+            // That means we can't retrieve build parameters from WorkflowRun
+            // as it is a subclass of Run, not of AbstractBuild.
+            // We need expand build parameters manually.
+            // See JENKINS-26694, JENKINS-30357 for details.
+            for (ParametersAction pa : build.getActions(ParametersAction.class)) {
+                // We have to extract parameters manually as ParametersAction#buildEnvVars
+                // (overrides EnvironmentContributingAction#buildEnvVars)
+                // is applicable only for AbstractBuild.
+                for (ParameterValue pv : pa.getParameters()) {
+                    pv.buildEnvironment(build, envVars);
+                }
+            }
+        }
+
+        return envVars;
     }
 
     /**

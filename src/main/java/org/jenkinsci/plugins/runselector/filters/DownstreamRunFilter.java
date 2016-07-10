@@ -97,7 +97,7 @@ public class DownstreamRunFilter extends RunFilter {
             return false;
         }
         
-        Job<?,?> copier = context.getCurrentRun().getParent();
+        Job<?,?> copier = context.getBuild().getParent();
         if (copier instanceof AbstractProject<?,?>) {
             copier = ((AbstractProject<?,?>)copier).getRootProject();
         }

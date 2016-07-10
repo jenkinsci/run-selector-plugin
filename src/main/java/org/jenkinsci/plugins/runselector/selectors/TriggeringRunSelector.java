@@ -186,7 +186,7 @@ public class TriggeringRunSelector extends RunSelector {
             // first time to be called.
             ext = new ContextExtension();
             List<Run<?, ?>> result = new ArrayList<Run<?, ?>>(
-                    getAllUpstreamBuilds(job, context, context.getCurrentRun())
+                    getAllUpstreamBuilds(job, context, context.getBuild())
             );
             // sort builds by the strategy.
             Collections.sort(
