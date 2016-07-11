@@ -356,7 +356,7 @@ public class RunSelectorContext implements Cloneable {
     private EnvVars constructEnvVars() throws IOException, InterruptedException {
         EnvVars envVars = build.getEnvironment(listener);
         if (build instanceof AbstractBuild) {
-            envVars.overrideAll(((AbstractBuild<?, ?>) build).getBuildVariables()); // Add in matrix axes..
+            envVars.putAll(((AbstractBuild<?, ?>) build).getBuildVariables()); // Add in matrix axes..
         } else {
             // Abstract#getEnvironment(TaskListener) put build parameters to
             // environments, but Run#getEnvironment(TaskListener) doesn't.

@@ -85,13 +85,12 @@ public class ParameterizedRunSelector extends RunSelector {
      * <ol>
      *   <li>Considers an immediate value if contains '&lt;'.
      *       This is expected to be used in especially in workflow jobs.</li>
-     *   <li>Otherwise, considers a variable expression if contains '$'.
-     *       This is to keep the compatibility of usage between workflow jobs and non-workflow jobs.</li>
-     *   <li>Otherwise, considers a variable name.</li>
+     *   <li>Otherwise, considers a variable expression if contains '$'.</li>
+     *   <li>Otherwise, it will not be taken into consideration.</li>
      * </ol>
      *
-     * @param context
-     * @return xstream expression.
+     * @param context the run selector context
+     * @return xstream expression
      */
     @CheckForNull
     private String resolveParameter(@Nonnull RunSelectorContext context) {
@@ -107,11 +106,7 @@ public class ParameterizedRunSelector extends RunSelector {
             context.logDebug("{0} is considered a variable expression", getParameterName());
             return context.getEnvVars().expand(getParameterName());
         }
-        String xml = context.getEnvVars().get(getParameterName());
-        if (xml == null) {
-            context.logInfo("{0} is not defined", getParameterName());
-        }
-        return xml;
+        return null;
     }
 
     @Extension(ordinal=-20)

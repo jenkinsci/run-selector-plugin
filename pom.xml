@@ -28,18 +28,12 @@
             <name>Alexandru Somai</name>
             <email>somai.alexandru@gmail.com</email>
         </developer>
-        <developer>
-            <id>ikedam</id>
-            <name>Ikeda Yasuyuki</name>
-            <email>devld@ikedam.jp</email>
-        </developer>
     </developers>
 
     <properties>
         <jenkins.version>1.580.1</jenkins.version>
-        <java.level>7</java.level>
+        <java.level>6</java.level>
         <workflow.version>1.4.2</workflow.version>
-        <jenkins-test-harness.version>2.1</jenkins-test-harness.version>
     </properties>
 
     <dependencies>
