@@ -33,7 +33,7 @@ import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
@@ -66,7 +66,7 @@ public class ParametersRunFilter extends RunFilter {
         return paramsToMatch;
     }
 
-    private List<StringParameterValue> getFilterParameters(@Nonnull RunSelectorPickContext context) {
+    private List<StringParameterValue> getFilterParameters(@Nonnull RunSelectorContext context) {
         // Initialize.. parse out the given parameters/values.
         List<StringParameterValue> filters = new ArrayList<StringParameterValue>(5);
         Matcher m = PARAMVAL_PATTERN.matcher(context.getEnvVars().expand(getParamsToMatch()));
@@ -79,7 +79,7 @@ public class ParametersRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(@Nonnull Run<?,?> run, @Nonnull RunSelectorPickContext context) {
+    public boolean isSelectable(@Nonnull Run<?,?> run, @Nonnull RunSelectorContext context) {
         EnvVars otherEnv;
         try {
             otherEnv = run.getEnvironment(TaskListener.NULL);

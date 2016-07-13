@@ -29,7 +29,7 @@ import hudson.model.Job;
 import hudson.model.Run;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.runselector.RunSelector;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.CheckForNull;
@@ -54,7 +54,7 @@ public class ParameterizedRunSelector extends RunSelector {
     }
 
     @CheckForNull
-    private RunSelector getSelector(@Nonnull RunSelectorPickContext context) {
+    private RunSelector getSelector(@Nonnull RunSelectorContext context) {
         String xml = resolveParameter(context);
         if (xml == null) {
             return null;
@@ -67,9 +67,9 @@ public class ParameterizedRunSelector extends RunSelector {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public Run<?, ?> pickBuildToCopyFrom(Job<?, ?> job, RunSelectorPickContext context)
+    @CheckForNull
+    public Run<?, ?> select(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         RunSelector selector = getSelector(context);
@@ -77,7 +77,7 @@ public class ParameterizedRunSelector extends RunSelector {
             context.logInfo("No selectors was resolved.");
             return null;
         }
-        return selector.pickBuildToCopyFrom(job, context);
+        return selector.select(job, context);
     }
 
     /**
@@ -85,16 +85,15 @@ public class ParameterizedRunSelector extends RunSelector {
      * <ol>
      *   <li>Considers an immediate value if contains '&lt;'.
      *       This is expected to be used in especially in workflow jobs.</li>
-     *   <li>Otherwise, considers a variable expression if contains '$'.
-     *       This is to keep the compatibility of usage between workflow jobs and non-workflow jobs.</li>
-     *   <li>Otherwise, considers a variable name.</li>
+     *   <li>Otherwise, considers a variable expression if contains '$'.</li>
+     *   <li>Otherwise, it will not be taken into consideration.</li>
      * </ol>
      *
-     * @param context
-     * @return xstream expression.
+     * @param context the run selector context
+     * @return xstream expression
      */
     @CheckForNull
-    private String resolveParameter(@Nonnull RunSelectorPickContext context) {
+    private String resolveParameter(@Nonnull RunSelectorContext context) {
         if (StringUtils.isBlank(getParameterName())) {
             context.logInfo("Parameter name is not specified");
             return null;
@@ -107,11 +106,7 @@ public class ParameterizedRunSelector extends RunSelector {
             context.logDebug("{0} is considered a variable expression", getParameterName());
             return context.getEnvVars().expand(getParameterName());
         }
-        String xml = context.getEnvVars().get(getParameterName());
-        if (xml == null) {
-            context.logInfo("{0} is not defined", getParameterName());
-        }
-        return xml;
+        return null;
     }
 
     @Extension(ordinal=-20)

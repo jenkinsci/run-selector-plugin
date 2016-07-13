@@ -38,7 +38,7 @@ import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.filters.AndRunFilter;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -178,11 +178,11 @@ public class FallbackRunSelector extends RunSelector {
      */
     @Override
     @CheckForNull
-    public Run<?, ?> pickBuildToCopyFrom(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context)
+    public Run<?, ?> select(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         for (Entry entry : getEntryList()) {
-            RunSelectorPickContext childContext = context.clone();
+            RunSelectorContext childContext = context.clone();
             if (entry.getRunFilter() instanceof NoRunFilter) {
                 // nothing to do.
             } else if (context.getRunFilter() instanceof NoRunFilter) {
@@ -199,7 +199,7 @@ public class FallbackRunSelector extends RunSelector {
             childContext.setLastMatchBuild(null);
             
             context.logDebug("Try {0}", entry.getRunSelector().getDisplayName());
-            Run<?, ?> candidate = entry.getRunSelector().pickBuildToCopyFrom(job, childContext);
+            Run<?, ?> candidate = entry.getRunSelector().select(job, childContext);
             if (candidate != null) {
                 return candidate;
             }

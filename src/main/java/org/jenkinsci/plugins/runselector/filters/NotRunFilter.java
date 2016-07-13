@@ -28,7 +28,7 @@ import hudson.Extension;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
@@ -60,7 +60,7 @@ public class NotRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(Run<?, ?> candidate, RunSelectorPickContext context) {
+    public boolean isSelectable(Run<?, ?> candidate, RunSelectorContext context) {
         boolean result = getRunFilter().isSelectable(candidate, context);
         context.logDebug(
                 "{0}: filters result by {1} is reverted: {2} -> {3}",

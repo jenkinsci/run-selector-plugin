@@ -37,7 +37,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -85,7 +85,7 @@ public class DownstreamRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(@Nonnull Run<?, ?> run, @Nonnull RunSelectorPickContext context) {
+    public boolean isSelectable(@Nonnull Run<?, ?> run, @Nonnull RunSelectorContext context) {
         if (!(run instanceof AbstractBuild<?,?>)) {
             // As this feature depends on `AbstractBuild#getUpstreamRelationshipBuild(AbstractProject<?,?>)`
             context.logInfo(
@@ -97,7 +97,7 @@ public class DownstreamRunFilter extends RunFilter {
             return false;
         }
         
-        Job<?,?> copier = context.getCopierBuild().getParent();
+        Job<?,?> copier = context.getBuild().getParent();
         if (copier instanceof AbstractProject<?,?>) {
             copier = ((AbstractProject<?,?>)copier).getRootProject();
         }

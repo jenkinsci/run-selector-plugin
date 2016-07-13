@@ -24,12 +24,13 @@
 package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.PermalinkProjectAction;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunSelector;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.CheckForNull;
@@ -37,25 +38,27 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 
 /**
- * Copy artifacts from a specific build.
+ * Select a specific build.
  * @author Alan Harder
  */
 public class SpecificRunSelector extends AbstractSpecificRunSelector {
 
+    @Nonnull
     private final String buildNumber;
 
     @DataBoundConstructor
     public SpecificRunSelector(String buildNumber) {
-        this.buildNumber = buildNumber;
+        this.buildNumber = Util.fixNull(buildNumber).trim();
     }
 
+    @Nonnull
     public String getBuildNumber() {
         return buildNumber;
     }
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context) throws IOException, InterruptedException {
+    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) throws IOException, InterruptedException {
         String num = context.getEnvVars().expand(buildNumber);
         if (num.startsWith("$")) {
             context.logDebug("unresolved variable {0}", num);

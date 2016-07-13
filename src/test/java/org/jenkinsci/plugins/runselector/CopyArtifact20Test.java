@@ -234,9 +234,9 @@ public class CopyArtifact20Test {
         FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
         FreeStyleBuild copieeBuild = j.buildAndAssertSuccess(copiee);
 
-        RunSelectorPickContext context = new RunSelectorPickContext();
+        RunSelectorContext context = new RunSelectorContext();
         context.setJenkins(j.jenkins);
-        context.setCopierBuild(copierBuild);
+        context.setCurrentRun(copierBuild);
         context.setListener(TaskListener.NULL);
         context.setEnvVars(new EnvVars());
         context.setVerbose(false);
@@ -248,7 +248,7 @@ public class CopyArtifact20Test {
 
         RunSelector ca = new RunSelector(copiee.getFullName());
 
-        RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+        RunSelectorPickResult r = ca.select(selectors, context);
         assertEquals(RunSelectorPickResult.Result.Found, r.result);
         assertEquals(copiee.getFullName(), r.getJob().getFullName());
         assertEquals(copieeBuild.getId(), r.getBuild().getId());
@@ -260,9 +260,9 @@ public class CopyArtifact20Test {
         FreeStyleProject copiee = j.createFreeStyleProject();
         FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
 
-        RunSelectorPickContext context = new RunSelectorPickContext();
+        RunSelectorContext context = new RunSelectorContext();
         context.setJenkins(j.jenkins);
-        context.setCopierBuild(copierBuild);
+        context.setCurrentRun(copierBuild);
         context.setListener(TaskListener.NULL);
         context.setEnvVars(new EnvVars());
         context.setVerbose(false);
@@ -274,7 +274,7 @@ public class CopyArtifact20Test {
 
         RunSelector ca = new RunSelector(copiee.getFullName());
 
-        RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+        RunSelectorPickResult r = ca.select(selectors, context);
         assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
         assertEquals(copiee.getFullName(), r.getJob().getFullName());
     }
@@ -287,9 +287,9 @@ public class CopyArtifact20Test {
             FreeStyleProject copiee = f.createProject(FreeStyleProject.class, "copiee");
             FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
 
-            RunSelectorPickContext context = new RunSelectorPickContext();
+            RunSelectorContext context = new RunSelectorContext();
             context.setJenkins(j.jenkins);
-            context.setCopierBuild(copierBuild);
+            context.setCurrentRun(copierBuild);
             context.setListener(TaskListener.NULL);
             context.setEnvVars(new EnvVars());
             context.setVerbose(false);
@@ -301,7 +301,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -318,9 +318,9 @@ public class CopyArtifact20Test {
             FreeStyleProject copiee = f2.createProject(FreeStyleProject.class, "copiee");
             FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
 
-            RunSelectorPickContext context = new RunSelectorPickContext();
+            RunSelectorContext context = new RunSelectorContext();
             context.setJenkins(j.jenkins);
-            context.setCopierBuild(copierBuild);
+            context.setCurrentRun(copierBuild);
             context.setListener(TaskListener.NULL);
             context.setEnvVars(new EnvVars());
             context.setVerbose(false);
@@ -332,7 +332,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -349,9 +349,9 @@ public class CopyArtifact20Test {
             FreeStyleProject copier = f.createProject(FreeStyleProject.class, "copier");
             FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
 
-            RunSelectorPickContext context = new RunSelectorPickContext();
+            RunSelectorContext context = new RunSelectorContext();
             context.setJenkins(j.jenkins);
-            context.setCopierBuild(copierBuild);
+            context.setCurrentRun(copierBuild);
             context.setListener(TaskListener.NULL);
             context.setEnvVars(new EnvVars());
             context.setVerbose(false);
@@ -363,7 +363,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -379,9 +379,9 @@ public class CopyArtifact20Test {
             FreeStyleProject copiee = f.createProject(FreeStyleProject.class, "copiee");
             FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
 
-            RunSelectorPickContext context = new RunSelectorPickContext();
+            RunSelectorContext context = new RunSelectorContext();
             context.setJenkins(j.jenkins);
-            context.setCopierBuild(copierBuild);
+            context.setCurrentRun(copierBuild);
             context.setListener(TaskListener.NULL);
             context.setEnvVars(new EnvVars());
             context.setVerbose(false);
@@ -393,7 +393,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.BuildNotFound, r.result);
             assertEquals(copiee.getFullName(), r.getJob().getFullName());
         } finally {
@@ -406,9 +406,9 @@ public class CopyArtifact20Test {
         FreeStyleProject copier = j.createFreeStyleProject();
         FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
 
-        RunSelectorPickContext context = new RunSelectorPickContext();
+        RunSelectorContext context = new RunSelectorContext();
         context.setJenkins(j.jenkins);
-        context.setCopierBuild(copierBuild);
+        context.setCurrentRun(copierBuild);
         context.setListener(TaskListener.NULL);
         context.setEnvVars(new EnvVars());
         context.setVerbose(false);
@@ -420,7 +420,7 @@ public class CopyArtifact20Test {
 
         RunSelector ca = new RunSelector("nosuchproject");
 
-        RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+        RunSelectorPickResult r = ca.select(selectors, context);
         assertEquals(RunSelectorPickResult.Result.ProjectNotFound, r.result);
     }
 
@@ -435,9 +435,9 @@ public class CopyArtifact20Test {
             FreeStyleBuild copierBuild = j.buildAndAssertSuccess(copier);
             FreeStyleBuild copieeBuild = j.buildAndAssertSuccess(copiee);
 
-            RunSelectorPickContext context = new RunSelectorPickContext();
+            RunSelectorContext context = new RunSelectorContext();
             context.setJenkins(j.jenkins);
-            context.setCopierBuild(copierBuild);
+            context.setCurrentRun(copierBuild);
             context.setListener(TaskListener.NULL);
             context.setEnvVars(new EnvVars());
             context.setVerbose(false);
@@ -449,7 +449,7 @@ public class CopyArtifact20Test {
 
             RunSelector ca = new RunSelector(copiee.getFullName());
 
-            RunSelectorPickResult r = ca.pickBuildToCopyFrom(selectors, context);
+            RunSelectorPickResult r = ca.select(selectors, context);
             assertEquals(RunSelectorPickResult.Result.ProjectNotFound, r.result);
         } finally {
             j.jenkins.setSecurityRealm(null);

@@ -31,7 +31,7 @@ import hudson.model.Run;
 import hudson.util.ComboBoxModel;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -54,7 +54,7 @@ public class PermalinkRunSelector extends AbstractSpecificRunSelector {
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorPickContext context) {
+    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
         Permalink p = job.getPermalinks().get(id);
         if (p==null)    return null;
         return p.resolve(job);
@@ -80,5 +80,4 @@ public class PermalinkRunSelector extends AbstractSpecificRunSelector {
             return r;
         }
     }
-
 }

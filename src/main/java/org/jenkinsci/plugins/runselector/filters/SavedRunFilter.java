@@ -27,11 +27,11 @@ import hudson.Extension;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorPickContext;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * Copy artifacts from the saved build (marked "keep forever").
+ * Select the saved build (marked "keep forever").
  * @author Alan Harder
  */
 public class SavedRunFilter extends RunFilter {
@@ -42,7 +42,7 @@ public class SavedRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(Run<?, ?> run, RunSelectorPickContext context) {
+    public boolean isSelectable(Run<?, ?> run, RunSelectorContext context) {
         return run.isKeepLog();
     }
 
