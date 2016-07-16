@@ -30,12 +30,23 @@
     </developers>
 
     <properties>
-        <jenkins.version>1.580.1</jenkins.version>
+        <jenkins.version>1.590</jenkins.version>
         <java.level>6</java.level>
         <workflow.version>1.4.2</workflow.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-support</artifactId>
+            <version>${workflow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-step-api</artifactId>
+            <version>${workflow.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
