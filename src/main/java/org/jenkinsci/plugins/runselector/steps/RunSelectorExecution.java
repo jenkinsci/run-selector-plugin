@@ -23,6 +23,8 @@ import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper;
  */
 public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWrapper> {
 
+    private static final long serialVersionUID = 1L;
+
     private static final RunSelector DEFAULT_RUN_SELECTOR = new StatusRunSelector();
     private static final RunFilter DEFAULT_RUN_FILTER = new NoRunFilter();
 
