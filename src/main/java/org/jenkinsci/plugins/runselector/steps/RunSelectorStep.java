@@ -86,5 +86,13 @@ public class RunSelectorStep extends AbstractStepImpl {
         public String getFunctionName() {
             return "runSelector";
         }
+
+        @Override
+        public String getHelpFile(String fieldName) {
+            if ("selector".equals(fieldName) || "runFilter".equals(fieldName) || "verbose".equals(fieldName)) {
+                return "/plugin/run-selector/help-" + fieldName + ".html";
+            }
+            return super.getHelpFile(fieldName);
+        }
     }
 }

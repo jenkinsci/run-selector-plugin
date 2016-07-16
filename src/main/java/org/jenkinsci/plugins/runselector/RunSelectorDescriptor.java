@@ -28,16 +28,13 @@ import hudson.model.Descriptor;
 
 /**
  * Descriptor for {@link RunSelector}.
- * Be aware that {@link RunSelector} in the old scheme might not use this.
  */
 public abstract class RunSelectorDescriptor extends Descriptor<RunSelector> {
-    /**
-     * 
-     */
+
     public RunSelectorDescriptor() {
         super();
     }
-    
+
     /**
      * @param clazz class to describe
      * @see Descriptor#Descriptor(Class)
