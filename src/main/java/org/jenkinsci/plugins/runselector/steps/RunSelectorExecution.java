@@ -50,7 +50,7 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
 
         RunSelector selector = step.getSelector();
         if (selector == null) {
-            listener.getLogger().println(Messages.RunSelectorStep_MissingRunSelector(DEFAULT_RUN_FILTER.getDisplayName()));
+            listener.getLogger().println(Messages.RunSelectorStep_MissingRunSelector(DEFAULT_RUN_SELECTOR.getDisplayName()));
             selector = DEFAULT_RUN_SELECTOR;
         }
 
