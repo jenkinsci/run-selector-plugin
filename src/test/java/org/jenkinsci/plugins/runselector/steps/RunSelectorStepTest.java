@@ -6,10 +6,15 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.localizer.LocaleProvider;
+
+import java.util.Locale;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.notNullValue;
@@ -27,6 +32,26 @@ public class RunSelectorStepTest {
 
     @ClassRule
     public static BuildWatcher watcher = new BuildWatcher();
+
+    private LocaleProvider providerToRestore;
+
+    @Before
+    public void setUp() {
+        providerToRestore = LocaleProvider.getProvider();
+
+        // expect English messages
+        LocaleProvider.setProvider(new LocaleProvider() {
+            @Override
+            public Locale get() {
+                return Locale.ENGLISH;
+            }
+        });
+    }
+
+    @After
+    public void tearDown() {
+        LocaleProvider.setProvider(providerToRestore);
+    }
 
     @Test
     public void missingProjectName() throws Exception {
