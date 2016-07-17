@@ -34,3 +34,57 @@ The implementations for the Run Filter are the followings:
  - **And Run filter** - accepts a build only when every underlying filters accepts it
  - **Or Run filter** - accepts a build when any of underlying filters accepts it
  - **Not Run filter** - accepts a build when the underlying filters don't accept it
+
+## Pipeline examples
+
+This plugin may also be used in Pipeline code. 
+It provides the `runSelector` step that selects a specific build based on the input parameters.
+The step returns a `RunWrapper` object which can be used as input parameter for other steps.
+
+### Select the last stable build
+
+By default, if no selector parameter is provided, the `runSelector` step selects the last stable build from the 
+upstream job.
+
+```groovy
+def runWrapper = runSelector projectName: 'upstream-project-name'
+```
+
+Alternatively, you can specify the selector:
+ 
+```groovy
+def runWrapper = runSelector projectName: 'upstream-project-name', 
+selector: [$class: 'StatusRunSelector', buildStatus: 'Stable'] 
+```
+
+Or, if you'd like to make use of *Permalink*, you can use:
+
+```groovy
+def runWrapper = runSelector projectName: 'upstream-project-name', 
+selector: [$class: 'PermalinkRunSelector', id: 'lastStableBuild'] 
+```
+
+### Select a specific build number
+
+You can select a specific build number from the upstream job. 
+In the following example, the *UPSTREAM_BUILD_NUMBER* is a build parameter.
+
+```groovy
+def runWrapper = runSelector projectName: 'upstream-project-name', 
+selector: [$class: 'SpecificRunSelector', buildNumber: UPSTREAM_BUILD_NUMBER] 
+```
+
+### Select the triggering build
+
+You may have an upstream job that triggers a specific downstream job by using the `build` step:
+
+```groovy
+build ('downstream-project-name')
+```
+
+A possible solutions to select the run that triggered your downstream job is by using the `TriggeringRunSelector`:
+
+```groovy
+def runWrapper = runSelector projectName: 'upstream-project-name', 
+selector: [$class: 'TriggeringRunSelector'] 
+```
