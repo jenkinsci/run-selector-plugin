@@ -41,7 +41,7 @@ This plugin may also be used in Pipeline code.
 It provides the `runSelector` step that selects a specific build based on the input parameters.
 The step returns a `RunWrapper` object which can be used as input parameter for other steps.
 
-### Select the last stable build
+### Select the build based on its status
 
 By default, if no selector parameter is provided, the `runSelector` step selects the last stable build from the 
 upstream job.
@@ -50,19 +50,25 @@ upstream job.
 def runWrapper = runSelector projectName: 'upstream-project-name'
 ```
 
-Alternatively, you can specify the selector:
+Alternatively, you can specify the `StatusRunSelector`. 
+For example, if you'd like to select the last successful build (stable or unstable), the value of the 
+`buildStatus` parameter has to be *Successful*:
  
 ```groovy
 def runWrapper = runSelector projectName: 'upstream-project-name', 
-selector: [$class: 'StatusRunSelector', buildStatus: 'Stable'] 
+selector: [$class: 'StatusRunSelector', buildStatus: 'Successful'] 
 ```
+The complete list of `buildStatus` values may be found in the Pipeline *Snippet Generator*.
 
-Or, if you'd like to make use of *Permalink*, you can use:
+Or, if you'd like to make use of *Permalink*, you can use the `PermalinkRunSelector`.
+For example, the permalink for selecting the last unstable build is *lastUnstableBuild*: 
 
 ```groovy
 def runWrapper = runSelector projectName: 'upstream-project-name', 
-selector: [$class: 'PermalinkRunSelector', id: 'lastStableBuild'] 
+selector: [$class: 'PermalinkRunSelector', id: 'lastUnstableBuild'] 
 ```
+
+The complete list of *Permalink* `id` values may be found in the Pipeline *Snippet Generator*. 
 
 ### Select a specific build number
 
@@ -82,7 +88,7 @@ You may have an upstream job that triggers a specific downstream job by using th
 build ('downstream-project-name')
 ```
 
-A possible solutions to select the run that triggered your downstream job is by using the `TriggeringRunSelector`:
+A possible solution to select the run that triggered your downstream job is by using the `TriggeringRunSelector`:
 
 ```groovy
 def runWrapper = runSelector projectName: 'upstream-project-name', 
