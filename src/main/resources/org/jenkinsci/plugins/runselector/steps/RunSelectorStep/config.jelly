@@ -1,11 +1,11 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-    <f:entry title="${%Project name}" field="projectName">
+    <f:entry title="${%Project name}" field="job">
         <f:editableComboBox items="${app.topLevelItemNames}" clazz="setting-input"/>
     </f:entry>
     <f:entry field="verbose">
         <f:checkbox title="${%Debug output}"/>
     </f:entry>
     <f:dropdownDescriptorSelector title="${%Which build}" field="selector"/>
-    <f:dropdownDescriptorSelector title="${%Run filter}" field="runFilter"/>
+    <f:dropdownDescriptorSelector title="${%Run filter}" field="filter"/>
 </j:jelly>

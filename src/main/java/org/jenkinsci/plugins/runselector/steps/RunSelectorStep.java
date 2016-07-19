@@ -21,7 +21,7 @@ import javax.annotation.CheckForNull;
 public class RunSelectorStep extends AbstractStepImpl {
 
     @CheckForNull
-    private final String projectName;
+    private final String job;
 
     private boolean verbose;
 
@@ -29,16 +29,16 @@ public class RunSelectorStep extends AbstractStepImpl {
     private RunSelector selector;
 
     @CheckForNull
-    private RunFilter runFilter;
+    private RunFilter filter;
 
     @DataBoundConstructor
-    public RunSelectorStep(String projectName) {
-        this.projectName = Util.fixEmptyAndTrim(projectName);
+    public RunSelectorStep(String job) {
+        this.job = Util.fixEmptyAndTrim(job);
     }
 
     @CheckForNull
-    public String getProjectName() {
-        return projectName;
+    public String getJob() {
+        return job;
     }
 
     @CheckForNull
@@ -61,13 +61,13 @@ public class RunSelectorStep extends AbstractStepImpl {
     }
 
     @CheckForNull
-    public RunFilter getRunFilter() {
-        return runFilter;
+    public RunFilter getFilter() {
+        return filter;
     }
 
     @DataBoundSetter
-    public void setRunFilter(RunFilter runFilter) {
-        this.runFilter = runFilter;
+    public void setFilter(RunFilter filter) {
+        this.filter = filter;
     }
 
     @Extension
@@ -89,7 +89,7 @@ public class RunSelectorStep extends AbstractStepImpl {
 
         @Override
         public String getHelpFile(String fieldName) {
-            if ("selector".equals(fieldName) || "runFilter".equals(fieldName) || "verbose".equals(fieldName)) {
+            if ("selector".equals(fieldName) || "filter".equals(fieldName) || "verbose".equals(fieldName)) {
                 return "/plugin/run-selector/help-" + fieldName + ".html";
             }
             return super.getHelpFile(fieldName);

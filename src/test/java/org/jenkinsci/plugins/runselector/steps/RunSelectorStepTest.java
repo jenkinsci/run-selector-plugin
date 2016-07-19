@@ -55,18 +55,18 @@ public class RunSelectorStepTest {
 
     @Test
     public void missingProjectName() throws Exception {
-        WorkflowRun run = createWorkflowJobAndRun("def runWrapper = runSelector projectName: '' ");
+        WorkflowRun run = createWorkflowJobAndRun("def runWrapper = runSelector job: '' ");
 
         j.assertBuildStatus(Result.FAILURE, run);
-        j.assertLogContains("ERROR: Project Name parameter not provided", run);
+        j.assertLogContains("ERROR: Job parameter not provided", run);
     }
 
     @Test
     public void missingProject() throws Exception {
-        WorkflowRun run = createWorkflowJobAndRun("def runWrapper = runSelector projectName: 'not-existent' ");
+        WorkflowRun run = createWorkflowJobAndRun("def runWrapper = runSelector job: 'not-existent' ");
 
         j.assertBuildStatus(Result.FAILURE, run);
-        j.assertLogContains("ERROR: Unable to find project named: not-existent. This may be due to incorrect project name or permission settings", run);
+        j.assertLogContains("ERROR: Unable to find any job named: not-existent. This may be due to incorrect project name or permission settings", run);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class RunSelectorStepTest {
         j.assertBuildStatusSuccess(upstreamRun);
 
         WorkflowRun run = createWorkflowJobAndRun(format("" +
-                "def runWrapper = runSelector projectName: '%s' \n" +
+                "def runWrapper = runSelector job: '%s' \n" +
                 "echo 'Selected run: ' + runWrapper.displayName", projectName));
 
         j.assertBuildStatusSuccess(run);
@@ -91,7 +91,7 @@ public class RunSelectorStepTest {
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatus(Result.FAILURE, upstreamRun);
 
-        WorkflowRun run = createWorkflowJobAndRun(format("def runWrapper = runSelector projectName: '%s' ", projectName));
+        WorkflowRun run = createWorkflowJobAndRun(format("def runWrapper = runSelector job: '%s' ", projectName));
 
         j.assertBuildStatus(Result.FAILURE, run);
         j.assertLogContains("Run Selector was not provided, using the default one: Latest specific status build (Stable)", run);
@@ -106,7 +106,7 @@ public class RunSelectorStepTest {
         j.assertBuildStatusSuccess(upstreamRun);
 
         WorkflowRun run = createWorkflowJobAndRun(format("" +
-                "def runWrapper = runSelector projectName: '%s', " +
+                "def runWrapper = runSelector job: '%s', " +
                 "selector: [$class: 'SpecificRunSelector', buildNumber: '-1'], " +
                 "verbose: true", projectName));
 

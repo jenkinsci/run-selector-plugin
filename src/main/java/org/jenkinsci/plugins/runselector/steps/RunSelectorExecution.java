@@ -39,15 +39,15 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
     @Override
     public RunWrapper run() throws Exception {
 
-        String projectName = step.getProjectName();
-        if (projectName == null) {
-            throw new AbortException(Messages.RunSelectorStep_MissingProjectName());
+        String jobName = step.getJob();
+        if (jobName == null) {
+            throw new AbortException(Messages.RunSelectorStep_MissingJobParameter());
         }
 
         Jenkins jenkins = Jenkins.getActiveInstance();
-        Job<?, ?> upstreamJob = jenkins.getItem(projectName, run.getParent(), Job.class);
+        Job<?, ?> upstreamJob = jenkins.getItem(jobName, run.getParent(), Job.class);
         if (upstreamJob == null) {
-            throw new AbortException(Messages.RunSelectorStep_MissingProject(projectName));
+            throw new AbortException(Messages.RunSelectorStep_MissingJob(jobName));
         }
 
         RunSelector selector = step.getSelector();
@@ -56,18 +56,18 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
             selector = DEFAULT_RUN_SELECTOR;
         }
 
-        RunFilter runFilter = step.getRunFilter();
-        if (runFilter == null) {
+        RunFilter filter = step.getFilter();
+        if (filter == null) {
             listener.getLogger().println(Messages.RunSelectorStep_MissingRunFilter());
-            runFilter = DEFAULT_RUN_FILTER;
+            filter = DEFAULT_RUN_FILTER;
         }
 
-        RunSelectorContext context = new RunSelectorContext(jenkins, run, listener, runFilter);
+        RunSelectorContext context = new RunSelectorContext(jenkins, run, listener, filter);
         context.setVerbose(step.isVerbose());
 
         Run<?, ?> upstreamRun = selector.select(upstreamJob, context);
         if (upstreamRun == null) {
-            throw new AbortException(Messages.RunSelectorStep_MissingRun(projectName, selector.getDisplayName(), runFilter.getDisplayName()));
+            throw new AbortException(Messages.RunSelectorStep_MissingRun(jobName, selector.getDisplayName(), filter.getDisplayName()));
         }
 
         return new RunWrapper(upstreamRun, false);
