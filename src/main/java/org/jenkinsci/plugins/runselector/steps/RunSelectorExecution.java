@@ -44,7 +44,10 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
             throw new AbortException(Messages.RunSelectorStep_MissingJobParameter());
         }
 
-        Jenkins jenkins = Jenkins.getActiveInstance();
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins == null) {
+            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
+        }
         Job<?, ?> upstreamJob = jenkins.getItem(jobName, run.getParent(), Job.class);
         if (upstreamJob == null) {
             throw new AbortException(Messages.RunSelectorStep_MissingJob(jobName));
