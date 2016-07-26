@@ -20,6 +20,7 @@ import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper;
  * The execution of {@link RunSelectorStep}.
  *
  * @author Alexandru Somai
+ * @since 1.0
  */
 public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWrapper> {
 

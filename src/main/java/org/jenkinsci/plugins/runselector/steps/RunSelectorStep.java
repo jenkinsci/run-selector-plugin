@@ -17,6 +17,7 @@ import javax.annotation.CheckForNull;
  * and, optionally, the run filter.
  *
  * @author Alexandru Somai
+ * @since 1.0
  */
 public class RunSelectorStep extends AbstractStepImpl {
 
