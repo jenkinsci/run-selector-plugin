@@ -13,13 +13,13 @@ import org.kohsuke.stapler.DataBoundSetter;
 import javax.annotation.CheckForNull;
 
 /**
- * The runSelector step selects a specific run from a given project name based on the given selector
+ * The selectRun step selects a specific run from a given project name based on the given selector
  * and, optionally, the run filter.
  *
  * @author Alexandru Somai
  * @since 1.0
  */
-public class RunSelectorStep extends AbstractStepImpl {
+public class SelectRunStep extends AbstractStepImpl {
 
     @CheckForNull
     private final String job;
@@ -33,7 +33,7 @@ public class RunSelectorStep extends AbstractStepImpl {
     private RunFilter filter;
 
     @DataBoundConstructor
-    public RunSelectorStep(String job) {
+    public SelectRunStep(String job) {
         this.job = Util.fixEmptyAndTrim(job);
     }
 
@@ -75,17 +75,17 @@ public class RunSelectorStep extends AbstractStepImpl {
     public static class DescriptorImpl extends AbstractStepDescriptorImpl {
 
         public DescriptorImpl() {
-            super(RunSelectorExecution.class);
+            super(SelectRunExecution.class);
         }
 
         @Override
         public String getDisplayName() {
-            return Messages.RunSelectorStep_DisplayName();
+            return Messages.SelectRunStep_DisplayName();
         }
 
         @Override
         public String getFunctionName() {
-            return "runSelector";
+            return "selectRun";
         }
 
         @Override

@@ -24,8 +24,14 @@
 
 package org.jenkinsci.plugins.runselector.filters;
 
+import hudson.model.Item;
+import hudson.model.ParametersAction;
+import hudson.model.ParametersDefinitionProperty;
+import hudson.model.Result;
+import hudson.model.StringParameterDefinition;
+import hudson.model.StringParameterValue;
 import org.apache.commons.lang.RandomStringUtils;
-import org.jenkinsci.plugins.runselector.steps.RunSelectorStep;
+import org.jenkinsci.plugins.runselector.steps.SelectRunStep;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -35,13 +41,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
-
-import hudson.model.Item;
-import hudson.model.ParametersAction;
-import hudson.model.ParametersDefinitionProperty;
-import hudson.model.Result;
-import hudson.model.StringParameterDefinition;
-import hudson.model.StringParameterValue;
 
 /**
  * Tests for {@link RunFilterParameter} and {@link ParameterizedRunFilter}
@@ -92,7 +91,7 @@ public class ParameterizedRunFilterTest {
     @Test
     public void testConfigureParameterizedBuildFilter() throws Exception {
         ParameterizedRunFilter filter = new ParameterizedRunFilter("${PARAM}");
-        RunSelectorStep step = new RunSelectorStep("test");
+        SelectRunStep step = new SelectRunStep("test");
         step.setFilter(filter);
         new StepConfigTester(j).configRoundTrip(step);
         j.assertEqualDataBoundBeans(filter, step.getFilter());
@@ -112,7 +111,7 @@ public class ParameterizedRunFilterTest {
             )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
-            "def runWrapper = runSelector"
+            "def runWrapper = selectRun"
             + " job: '%s',"
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
@@ -138,7 +137,7 @@ public class ParameterizedRunFilterTest {
             )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
-            "def runWrapper = runSelector"
+            "def runWrapper = selectRun"
             + " job: '%s',"
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
@@ -169,7 +168,7 @@ public class ParameterizedRunFilterTest {
             )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
-            "def runWrapper = runSelector"
+            "def runWrapper = selectRun"
             + " job: '%s',"
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
@@ -201,7 +200,7 @@ public class ParameterizedRunFilterTest {
             )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
-            "def runWrapper = runSelector"
+            "def runWrapper = selectRun"
             + " job: '%s',"
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;",
@@ -233,7 +232,7 @@ public class ParameterizedRunFilterTest {
             )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
-            "def runWrapper = runSelector"
+            "def runWrapper = selectRun"
             + " job: '%s',"
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
