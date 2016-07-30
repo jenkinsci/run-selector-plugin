@@ -70,6 +70,14 @@ public class RunFilterParameter extends SimpleParameterDefinition {
      * {@inheritDoc}
      */
     @Override
+    public ParameterValue getDefaultParameterValue() {
+        return createValue(ParameterizedRunFilter.encodeToXml(getDefaultFilter()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ParameterValue createValue(String value) {
         return new StringParameterValue(getName(), value, getDescription());
     }
