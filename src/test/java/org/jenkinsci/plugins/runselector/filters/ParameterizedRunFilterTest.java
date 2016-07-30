@@ -24,8 +24,6 @@
 
 package org.jenkinsci.plugins.runselector.filters;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.plugins.runselector.steps.RunSelectorStep;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -39,7 +37,6 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import hudson.model.Item;
-import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Result;
@@ -53,20 +50,20 @@ public class ParameterizedRunFilterTest {
     @ClassRule
     public static final JenkinsRule j = new JenkinsRule();
 
-    private static WorkflowJob jobToCopyFrom;
-    private static WorkflowRun runToCopyFrom1;
-    private static WorkflowRun runToCopyFrom2;
+    private static WorkflowJob jobToSelect;
+    private static WorkflowRun runToSelect1;
+    private static WorkflowRun runToSelect2;
 
     @BeforeClass
-    public static void prepareBuildsToCopyFrom() throws Exception {
-        jobToCopyFrom = j.jenkins.createProject(
+    public static void prepareBuildsToSelect() throws Exception {
+        jobToSelect = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)
         );
-        jobToCopyFrom.setDefinition(new CpsFlowDefinition("// do nothing"));
-        runToCopyFrom1 = j.assertBuildStatusSuccess(jobToCopyFrom.scheduleBuild2(0));
-        runToCopyFrom2 = j.assertBuildStatusSuccess(jobToCopyFrom.scheduleBuild2(0));
-        runToCopyFrom1.keepLog();
+        jobToSelect.setDefinition(new CpsFlowDefinition("// do nothing"));
+        runToSelect1 = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        runToSelect2 = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        runToSelect1.keepLog();
     }
 
     @Test
@@ -83,9 +80,7 @@ public class ParameterizedRunFilterTest {
                 WorkflowJob.class,
                 RandomStringUtils.randomAlphanumeric(7)
         );
-        job.addProperty(new ParametersDefinitionProperty(
-            Arrays.<ParameterDefinition>asList(param)
-        ));
+        job.addProperty(new ParametersDefinitionProperty(param));
         j.configRoundtrip((Item)job);
         j.assertEqualDataBoundBeans(
             param,
@@ -110,11 +105,11 @@ public class ParameterizedRunFilterTest {
             RandomStringUtils.randomAlphanumeric(7)
         );
         selecter.addProperty(new ParametersDefinitionProperty(
-            Arrays.<ParameterDefinition>asList(new RunFilterParameter(
+            new RunFilterParameter(
                 "FILTER",
                 "description",
                 new SavedRunFilter()
-            ))
+            )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
             "def runWrapper = runSelector"
@@ -122,8 +117,8 @@ public class ParameterizedRunFilterTest {
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
             + "assert(runWrapper.id == '%s')",
-            jobToCopyFrom.getFullName(),
-            runToCopyFrom1.getId()
+            jobToSelect.getFullName(),
+            runToSelect1.getId()
         )));
 
         j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));
@@ -136,11 +131,11 @@ public class ParameterizedRunFilterTest {
             RandomStringUtils.randomAlphanumeric(7)
         );
         selecter.addProperty(new ParametersDefinitionProperty(
-            Arrays.<ParameterDefinition>asList(new RunFilterParameter(
+            new RunFilterParameter(
                 "FILTER",
                 "description",
                 new NoRunFilter()
-            ))
+            )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
             "def runWrapper = runSelector"
@@ -148,8 +143,8 @@ public class ParameterizedRunFilterTest {
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
             + "assert(runWrapper.id == '%s')",
-            jobToCopyFrom.getFullName(),
-            runToCopyFrom1.getId()
+            jobToSelect.getFullName(),
+            runToSelect1.getId()
         )));
 
         j.assertBuildStatusSuccess(selecter.scheduleBuild2(
@@ -167,11 +162,11 @@ public class ParameterizedRunFilterTest {
             RandomStringUtils.randomAlphanumeric(7)
         );
         selecter.addProperty(new ParametersDefinitionProperty(
-            Arrays.<ParameterDefinition>asList(new RunFilterParameter(
+            new RunFilterParameter(
                 "FILTER",
                 "description",
                 new SavedRunFilter()
-            ))
+            )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
             "def runWrapper = runSelector"
@@ -179,8 +174,8 @@ public class ParameterizedRunFilterTest {
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
             + "assert(runWrapper.id == '%s')",
-            jobToCopyFrom.getFullName(),
-            runToCopyFrom1.getId()
+            jobToSelect.getFullName(),
+            runToSelect1.getId()
         )));
 
         WebClient wc = j.createWebClient();
@@ -199,18 +194,18 @@ public class ParameterizedRunFilterTest {
             RandomStringUtils.randomAlphanumeric(7)
         );
         selecter.addProperty(new ParametersDefinitionProperty(
-            Arrays.<ParameterDefinition>asList(new RunFilterParameter(
+            new RunFilterParameter(
                 "FILTER",
                 "description",
                 new NoRunFilter()
-            ))
+            )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
             "def runWrapper = runSelector"
             + " job: '%s',"
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;",
-            jobToCopyFrom.getFullName()
+            jobToSelect.getFullName()
         )));
 
         j.assertBuildStatus(
@@ -231,11 +226,11 @@ public class ParameterizedRunFilterTest {
             RandomStringUtils.randomAlphanumeric(7)
         );
         selecter.addProperty(new ParametersDefinitionProperty(
-            Arrays.<ParameterDefinition>asList(new StringParameterDefinition(
+            new StringParameterDefinition(
                 "FILTER",
                 "",
                 "description"
-            ))
+            )
         ));
         selecter.setDefinition(new CpsFlowDefinition(String.format(
             "def runWrapper = runSelector"
@@ -243,8 +238,8 @@ public class ParameterizedRunFilterTest {
             + " filter: [$class: 'ParameterizedRunFilter', parameter: '${FILTER}'],"
             + " verbose: true;"
             + "assert(runWrapper.id == '%s')",
-            jobToCopyFrom.getFullName(),
-            runToCopyFrom2.getId()
+            jobToSelect.getFullName(),
+            runToSelect2.getId()
         )));
 
         j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));
