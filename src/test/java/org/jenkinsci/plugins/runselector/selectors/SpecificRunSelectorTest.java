@@ -14,6 +14,7 @@ import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.filters.ParametersRunFilter;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -28,13 +29,19 @@ public class SpecificRunSelectorTest {
     @ClassRule
     public static final JenkinsRule j = new JenkinsRule();
 
+    private static FreeStyleProject jobToSelect;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        jobToSelect = j.createFreeStyleProject();
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
+    }
+
     @Test
     public void testSpecificRunSelector() throws Exception {
-        FreeStyleProject jobToSelect = j.createFreeStyleProject();
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(2));
-
         FreeStyleProject selecter = j.createFreeStyleProject();
         SpecificRunSelector selector = new SpecificRunSelector("1");
         assertThat(selector.getBuildNumber(), is("1"));
@@ -46,11 +53,6 @@ public class SpecificRunSelectorTest {
 
     @Test
     public void testSpecificRunSelectorParameter() throws Exception {
-        FreeStyleProject jobToSelect = j.createFreeStyleProject();
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(2));
-
         FreeStyleProject selecter = j.createFreeStyleProject();
         ParameterDefinition paramDef = new StringParameterDefinition("BAR", "1");
         selecter.addProperty(new ParametersDefinitionProperty(paramDef));
@@ -86,12 +88,6 @@ public class SpecificRunSelectorTest {
     @Issue("JENKINS-14266")
     @Test
     public void testUnsetVar() throws Exception {
-        FreeStyleProject jobToSelect = j.createFreeStyleProject();
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
-
         FreeStyleProject selecter = j.createFreeStyleProject();
         RunSelector selector = new SpecificRunSelector("$NUM");
 
@@ -119,11 +115,6 @@ public class SpecificRunSelectorTest {
     @Issue("JENKINS-19693")
     @Test
     public void testDisplayName() throws Exception {
-        FreeStyleProject jobToSelect = j.createFreeStyleProject();
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
         jobToSelect.getBuildByNumber(2).setDisplayName("RC1");
 
         FreeStyleProject selecter = j.createFreeStyleProject();
@@ -152,12 +143,6 @@ public class SpecificRunSelectorTest {
 
     @Test
     public void testPermalink() throws Exception {
-        FreeStyleProject jobToSelect = j.createFreeStyleProject();
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
-
         FreeStyleProject selecter = j.createFreeStyleProject();
         RunSelector selector = new SpecificRunSelector("$NUM");
 
