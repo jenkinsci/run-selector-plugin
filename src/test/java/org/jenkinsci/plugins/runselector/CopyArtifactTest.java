@@ -579,49 +579,6 @@ public class CopyArtifactTest {
     }*/
 
     @Test
-    public void testSpecificRunSelector() throws Exception {
-        FreeStyleProject other = createArtifactProject(),
-                         p = rule.createFreeStyleProject();
-        ParameterDefinition paramDef = new StringParameterDefinition("FOO", "foo");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        other.addProperty(paramsDef);
-        SpecificRunSelector sbs = new SpecificRunSelector("1");
-        assertEquals("1", sbs.getBuildNumber());
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), null, sbs, "*.txt", "", false, false, true));
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("FOO", "buildone"))).get());
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()));
-        FreeStyleBuild b = p.scheduleBuild2(0, new UserCause()).get();
-        rule.assertBuildStatusSuccess(b);
-        assertFile(true, "foo.txt", b);
-        assertFile(true, "buildone.txt", b);
-        assertFile(false, "subdir/subfoo.txt", b);
-    }
-
-    @Test
-    public void testSpecificRunSelectorParameter() throws Exception {
-        FreeStyleProject other = createArtifactProject(),
-                         p = rule.createFreeStyleProject();
-        ParameterDefinition paramDef = new StringParameterDefinition("FOO", "foo");
-        ParameterDefinition paramDef2 = new StringParameterDefinition("BAR", "1");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        other.addProperty(paramsDef);
-        ParametersDefinitionProperty paramsDef2 = new ParametersDefinitionProperty(paramDef2);
-        p.addProperty(paramsDef2);
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(),
-                null, new SpecificRunSelector("$BAR"), "*.txt", "", false, false, true));
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("FOO", "buildone"))).get());
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()));
-        FreeStyleBuild b = p.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("BAR", "1"))).get();
-        rule.assertBuildStatusSuccess(b);
-        assertFile(true, "foo.txt", b);
-        assertFile(true, "buildone.txt", b);
-        assertFile(false, "subdir/subfoo.txt", b);
-    }
-
-    @Test
     public void testParameterizedRunSelector() throws Exception {
         FreeStyleProject other = createArtifactProject(),
                          p = rule.createFreeStyleProject();
@@ -1213,22 +1170,6 @@ public class CopyArtifactTest {
         assertFile(true, "buildone.txt", b);
         assertFile(false, "subdir/subfoo.txt", b);
     }*/
-
-    // Verify build fails if given build# does not match params
-    @Test
-    public void testSpecificRunSelectorWithParameterFilter() throws Exception {
-        FreeStyleProject other = createArtifactProject(),
-                         p = rule.createFreeStyleProject();
-        other.addProperty(new ParametersDefinitionProperty(new StringParameterDefinition("FOO", "")));
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "FOO=bogus",
-                new SpecificRunSelector("1"), "*.txt", "", false, false, true));
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("FOO", "foo"))).get());
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()));
-        FreeStyleBuild b = p.scheduleBuild2(0, new UserCause()).get();
-        rule.assertBuildStatus(Result.FAILURE, b);
-        assertFile(false, "foo.txt", b);
-    }
 
     // Verify RunSelector defaults to false
 /*
