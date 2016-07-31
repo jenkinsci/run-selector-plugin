@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.runselector;
+package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.model.Cause;
 import hudson.model.FreeStyleProject;
@@ -7,8 +7,8 @@ import hudson.model.Run;
 import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import org.hamcrest.Matchers;
+import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
-import org.jenkinsci.plugins.runselector.selectors.SpecificRunSelector;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
