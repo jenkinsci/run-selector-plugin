@@ -5,193 +5,160 @@ import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
 import hudson.model.Run;
 import hudson.model.StringParameterValue;
+import hudson.model.TaskListener;
+import org.hamcrest.Matchers;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.selectors.SpecificRunSelector;
-import org.jenkinsci.plugins.runselector.testutils.CopyArtifactUtil;
-import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.jvnet.hudson.test.CaptureEnvironmentBuilder;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
-@Ignore
 public class SpecificRunSelectorTest {
-    @Rule
-    public final JenkinsRule rule = new JenkinsRule();
+
+    @ClassRule
+    public static final JenkinsRule j = new JenkinsRule();
 
     @Issue("JENKINS-14266")
     @Test
     public void testUnsetVar() throws Exception {
-        FreeStyleProject p = rule.createFreeStyleProject();
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        assertEquals(3, p.getLastBuild().number);
-        
-        FreeStyleProject copier = rule.createFreeStyleProject();
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                p.getFullDisplayName(),
-                "",     // parameter
-                new SpecificRunSelector("$NUM"),
-                "**/*", // filters
-                "",     // excludes
-                "",     // target
-                false,  // flatten
-                true,   // optional
-                false,  // fingerprintArtifacts
-                "RESULT"// resultVariableSuffix
-        ));
-        CaptureEnvironmentBuilder ceb = new CaptureEnvironmentBuilder();
-        copier.getBuildersList().add(ceb);
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
+
+        FreeStyleProject selecter = j.createFreeStyleProject();
+        RunSelector selector = new SpecificRunSelector("$NUM");
+
+        Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "2")
                 )
         ));
-        assertEquals("2", ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun.getNumber(), is(2));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("HUM", "two")
                 )
         ));
-        assertEquals(null, ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, nullValue());
     }
 
     @Issue("JENKINS-19693")
     @Test
     public void testDisplayName() throws Exception {
-        FreeStyleProject p = rule.createFreeStyleProject();
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        assertEquals(3, p.getLastBuild().number);
-        p.getBuildByNumber(2).setDisplayName("RC1");
-        
-        FreeStyleProject copier = rule.createFreeStyleProject();
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                p.getFullDisplayName(),
-                "",     // parameter
-                new SpecificRunSelector("$NUM"),
-                "**/*", // filters
-                "",     // excludes
-                "",     // target
-                false,  // flatten
-                true,   // optional
-                false,  // fingerprintArtifacts
-                "RESULT"// resultVariableSuffix
-        ));
-        CaptureEnvironmentBuilder ceb = new CaptureEnvironmentBuilder();
-        copier.getBuildersList().add(ceb);
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
+        jobToSelect.getBuildByNumber(2).setDisplayName("RC1");
+
+        FreeStyleProject selecter = j.createFreeStyleProject();
+        RunSelector selector = new SpecificRunSelector("$NUM");
+
+        Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "RC1")
                 )
         ));
-        assertEquals("2", ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun.getNumber(), is(2));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "RC2")
                 )
         ));
-        assertEquals(null, ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-    }
-
-    private String getBuildNumberOf(Run<?,?> r) {
-        if (r == null) {
-            return null;
-        }
-        return Integer.toString(r.getNumber());
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, nullValue());
     }
 
     @Test
     public void testPermalink() throws Exception {
-        FreeStyleProject p = rule.createFreeStyleProject();
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        assertEquals(3, p.getLastBuild().number);
-        
-        FreeStyleProject copier = rule.createFreeStyleProject();
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                p.getFullDisplayName(),
-                "",     // parameter
-                new SpecificRunSelector("$NUM"),
-                "**/*", // filters
-                "",     // excludes
-                "",     // target
-                false,  // flatten
-                true,   // optional
-                false,  // fingerprintArtifacts
-                "RESULT"// resultVariableSuffix
-        ));
-        CaptureEnvironmentBuilder ceb = new CaptureEnvironmentBuilder();
-        copier.getBuildersList().add(ceb);
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
+
+        FreeStyleProject selecter = j.createFreeStyleProject();
+        RunSelector selector = new SpecificRunSelector("$NUM");
+
+        Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "lastSuccessfulBuild")
                 )
         ));
-        assertEquals(getBuildNumberOf(p.getLastSuccessfulBuild()), ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastSuccessfulBuild()));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "lastStableBuild")
                 )
         ));
-        assertEquals(getBuildNumberOf(p.getLastStableBuild()), ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastSuccessfulBuild()));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "lastBuild")
                 )
         ));
-        assertEquals(getBuildNumberOf(p.getLastBuild()), ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastBuild()));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "lastFailedBuild")
                 )
         ));
-        assertEquals(getBuildNumberOf(p.getLastFailedBuild()), ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastFailedBuild()));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "lastUnstableBuild")
                 )
         ));
-        assertEquals(getBuildNumberOf(p.getLastUnstableBuild()), ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
-        
-        rule.assertBuildStatusSuccess(copier.scheduleBuild2(
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastUnstableBuild()));
+
+        run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 new Cause.UserIdCause(),
                 new ParametersAction(
                         new StringParameterValue("NUM", "lastUnsuccessfulBuild")
                 )
         ));
-        assertEquals(getBuildNumberOf(p.getLastUnsuccessfulBuild()), ceb.getEnvVars().get("COPYARTIFACT_BUILD_NUMBER_RESULT"));
+        selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastUnsuccessfulBuild()));
     }
-
 }
