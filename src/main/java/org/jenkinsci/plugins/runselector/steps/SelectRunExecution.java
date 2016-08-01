@@ -17,12 +17,12 @@ import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 import org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper;
 
 /**
- * The execution of {@link RunSelectorStep}.
+ * The execution of {@link SelectRunStep}.
  *
  * @author Alexandru Somai
  * @since 1.0
  */
-public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWrapper> {
+public class SelectRunExecution extends AbstractSynchronousStepExecution<RunWrapper> {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +30,7 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
     private static final RunFilter DEFAULT_RUN_FILTER = new NoRunFilter();
 
     @Inject
-    private transient RunSelectorStep step;
+    private transient SelectRunStep step;
 
     @StepContextParameter
     private transient Run<?, ?> run;
@@ -42,7 +42,7 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
 
         String jobName = step.getJob();
         if (jobName == null) {
-            throw new AbortException(Messages.RunSelectorStep_MissingJobParameter());
+            throw new AbortException(Messages.SelectRunStep_MissingJobParameter());
         }
 
         Jenkins jenkins = Jenkins.getInstance();
@@ -51,18 +51,18 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
         }
         Job<?, ?> upstreamJob = jenkins.getItem(jobName, run.getParent(), Job.class);
         if (upstreamJob == null) {
-            throw new AbortException(Messages.RunSelectorStep_MissingJob(jobName));
+            throw new AbortException(Messages.SelectRunStep_MissingJob(jobName));
         }
 
         RunSelector selector = step.getSelector();
         if (selector == null) {
-            listener.getLogger().println(Messages.RunSelectorStep_MissingRunSelector(DEFAULT_RUN_SELECTOR.getDisplayName()));
+            listener.getLogger().println(Messages.SelectRunStep_MissingRunSelector(DEFAULT_RUN_SELECTOR.getDisplayName()));
             selector = DEFAULT_RUN_SELECTOR;
         }
 
         RunFilter filter = step.getFilter();
         if (filter == null) {
-            listener.getLogger().println(Messages.RunSelectorStep_MissingRunFilter());
+            listener.getLogger().println(Messages.SelectRunStep_MissingRunFilter());
             filter = DEFAULT_RUN_FILTER;
         }
 
@@ -71,7 +71,7 @@ public class RunSelectorExecution extends AbstractSynchronousStepExecution<RunWr
 
         Run<?, ?> upstreamRun = selector.select(upstreamJob, context);
         if (upstreamRun == null) {
-            throw new AbortException(Messages.RunSelectorStep_MissingRun(jobName, selector.getDisplayName(), filter.getDisplayName()));
+            throw new AbortException(Messages.SelectRunStep_MissingRun(jobName, selector.getDisplayName(), filter.getDisplayName()));
         }
 
         return new RunWrapper(upstreamRun, false);
