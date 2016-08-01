@@ -12,13 +12,13 @@ The **Run Selector** extension point has several implementations which can be us
    - Completed (any status)
    - Any (including not completed)
  - **Permalink Run Selector** - selects the run based on the permalink. Possible values:
-   - 'lastBuild'
-   - 'lastStableBuild'
-   - 'lastSuccessfulBuild'
-   - 'lastFailedBuild'
-   - 'lastUnstableBuild'
-   - 'lastUnsuccessfulBuild'
-   - 'lastCompletedBuild'
+   - `lastBuild`
+   - `lastStableBuild`
+   - `lastSuccessfulBuild`
+   - `lastFailedBuild`
+   - `lastUnstableBuild`
+   - `lastUnsuccessfulBuild`
+   - `lastCompletedBuild`
  - **Triggering Run Selector** - selects the run that triggered this run (usually the upstream run)
  - **Specific Run Selector** - selects the run based on the given build number parameter
  - **Parameterized Run Selector** - selects the run based on a parameter
@@ -47,7 +47,7 @@ By default, if no selector parameter is provided, the `runSelector` step selects
 upstream job.
 
 ```groovy
-def runWrapper = runSelector job: 'upstream-project-name'
+def runWrapper = runSelector 'upstream-project-name'
 ```
 
 Alternatively, you can specify the `StatusRunSelector`. 
@@ -85,7 +85,7 @@ selector: [$class: 'SpecificRunSelector', buildNumber: UPSTREAM_BUILD_NUMBER]
 You may have an upstream job that triggers a specific downstream job by using the `build` step:
 
 ```groovy
-build ('downstream-project-name')
+build 'downstream-project-name'
 ```
 
 A possible solution to select the run that triggered your downstream job is by using the `TriggeringRunSelector`:
@@ -94,3 +94,5 @@ A possible solution to select the run that triggered your downstream job is by u
 def runWrapper = runSelector job: 'upstream-project-name', 
 selector: [$class: 'TriggeringRunSelector'] 
 ```
+
+Of course you could instead (and more explicitly) have the upstream build pass `currentBuild.number` as a build parameter.
