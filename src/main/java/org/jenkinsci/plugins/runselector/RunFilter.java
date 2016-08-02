@@ -43,7 +43,7 @@ import java.util.List;
  * Use {@link RunFilterDescriptor} for its descriptor.
  * @author Alan Harder
  */
-public class RunFilter extends AbstractDescribableImpl<RunFilter> implements ExtensionPoint {
+public abstract class RunFilter extends AbstractDescribableImpl<RunFilter> implements ExtensionPoint {
 
     /**
      * @param candidate the build to check
