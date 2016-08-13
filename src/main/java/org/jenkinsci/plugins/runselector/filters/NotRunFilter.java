@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.runselector.filters;
 
 import hudson.Extension;
 import hudson.model.Run;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
@@ -75,7 +76,8 @@ public class NotRunFilter extends RunFilter {
     /**
      * the descriptor for {@link NotRunFilter}
      */
-    @Extension(ordinal=-102)    // bottom most
+    @Symbol("not")
+    @Extension(ordinal = -102)    // bottom most
     public static class DescriptorImpl extends RunFilterDescriptor {
         /**
          * {@inheritDoc}

@@ -24,11 +24,12 @@
 package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
-import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Run;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelector;
+import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -109,8 +110,13 @@ public class ParameterizedRunSelector extends RunSelector {
         return null;
     }
 
-    @Extension(ordinal=-20)
-    public static final Descriptor<RunSelector> DESCRIPTOR =
-            new SimpleRunSelectorDescriptor(
-                ParameterizedRunSelector.class, org.jenkinsci.plugins.runselector.Messages._ParameterizedRunSelector_DisplayName());
+    @Symbol("parameterized")
+    @Extension(ordinal = -20)
+    public static class DescriptorImpl extends RunSelectorDescriptor {
+
+        @Override
+        public String getDisplayName() {
+            return org.jenkinsci.plugins.runselector.Messages.ParameterizedRunSelector_DisplayName();
+        }
+    }
 }

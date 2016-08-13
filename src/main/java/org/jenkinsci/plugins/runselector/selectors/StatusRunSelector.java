@@ -24,11 +24,12 @@
 package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
-import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelector;
+import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -186,8 +187,13 @@ public class StatusRunSelector extends RunSelector {
         );
     }
 
+    @Symbol("status")
     @Extension(ordinal = 100)
-    public static final Descriptor<RunSelector> DESCRIPTOR =
-            new SimpleRunSelectorDescriptor(
-                    StatusRunSelector.class, org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_DisplayName());
+    public static class DescriptorImpl extends RunSelectorDescriptor {
+
+        @Override
+        public String getDisplayName() {
+            return org.jenkinsci.plugins.runselector.Messages.StatusRunSelector_DisplayName();
+        }
+    }
 }

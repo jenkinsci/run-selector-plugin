@@ -34,6 +34,7 @@ import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.RunSelector;
@@ -206,8 +207,9 @@ public class FallbackRunSelector extends RunSelector {
         }
         return null;
     }
-    
-    @Extension(ordinal=-100)    // bottom most
+
+    @Symbol("fallback")
+    @Extension(ordinal = -100)    // bottom most
     public static class DescriptorImpl extends RunSelectorDescriptor {
         @Override
         public String getDisplayName() {

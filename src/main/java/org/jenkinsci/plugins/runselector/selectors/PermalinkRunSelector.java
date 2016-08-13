@@ -30,6 +30,7 @@ import hudson.model.PermalinkProjectAction.Permalink;
 import hudson.model.Run;
 import hudson.util.ComboBoxModel;
 import jenkins.model.Jenkins;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.AncestorInPath;
@@ -60,6 +61,7 @@ public class PermalinkRunSelector extends AbstractSpecificRunSelector {
         return p.resolve(job);
     }
 
+    @Symbol("permalink")
     @Extension
     public static class DescriptorImpl extends RunSelectorDescriptor {
         @Override

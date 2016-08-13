@@ -31,6 +31,7 @@ import hudson.model.Cause.UpstreamCause;
 import hudson.model.Job;
 import hudson.model.Run;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
@@ -262,6 +263,7 @@ public class TriggeringRunSelector extends RunSelector {
     /**
      * the descriptor for {@link TriggeringRunSelector}
      */
+    @Symbol("triggering")
     @Extension
     public static class DescriptorImpl extends RunSelectorDescriptor {
         private UpstreamFilterStrategy globalUpstreamFilterStrategy;

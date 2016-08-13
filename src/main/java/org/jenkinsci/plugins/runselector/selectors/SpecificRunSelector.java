@@ -25,11 +25,11 @@ package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
 import hudson.Util;
-import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.PermalinkProjectAction;
 import hudson.model.Run;
-import org.jenkinsci.plugins.runselector.RunSelector;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -95,8 +95,13 @@ public class SpecificRunSelector extends AbstractSpecificRunSelector {
         return run;
     }
 
-    @Extension(ordinal=-10)
-    public static final Descriptor<RunSelector> DESCRIPTOR =
-            new SimpleRunSelectorDescriptor(
-                SpecificRunSelector.class, org.jenkinsci.plugins.runselector.Messages._SpecificRunSelector_DisplayName());
+    @Symbol("specificRun")
+    @Extension(ordinal = -10)
+    public static class DescriptorImpl extends RunSelectorDescriptor {
+
+        @Override
+        public String getDisplayName() {
+            return org.jenkinsci.plugins.runselector.Messages.SpecificRunSelector_DisplayName();
+        }
+    }
 }
