@@ -17,8 +17,11 @@ import org.jvnet.localizer.LocaleProvider;
 import java.util.Locale;
 
 import static java.lang.String.format;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 
 /**
  * Tests for the {@link SelectRunStep}.
@@ -115,7 +118,73 @@ public class SelectRunStepTest {
         j.assertLogContains(format("ERROR: Unable to find Run for: %s, with selector: Specific build and filter: No Filter", projectName), run);
     }
 
-    private WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
+    @Test
+    public void testStatusSymbol() throws Exception {
+        assumeSymbolDependencies();
+
+        WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
+        String projectName = upstreamRun.getParent().getFullName();
+        j.assertBuildStatusSuccess(upstreamRun);
+
+        WorkflowRun run = createWorkflowJobAndRun(format("" +
+                "def runWrapper = selectRun job: '%s', " +
+                " selector: status('Stable'), " +
+                " verbose: true", projectName));
+
+        j.assertBuildStatusSuccess(run);
+    }
+
+    @Test
+    public void testSpecificRunSymbol() throws Exception {
+        assumeSymbolDependencies();
+
+        WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
+        String projectName = upstreamRun.getParent().getFullName();
+        j.assertBuildStatusSuccess(upstreamRun);
+
+        WorkflowRun run = createWorkflowJobAndRun(format("" +
+                "def runWrapper = selectRun job: '%s', " +
+                " selector: specificRun('1'), " +
+                " verbose: true", projectName));
+
+        j.assertBuildStatusSuccess(run);
+    }
+
+    @Test
+    public void testPermalinkSymbol() throws Exception {
+        assumeSymbolDependencies();
+
+        WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
+        String projectName = upstreamRun.getParent().getFullName();
+        j.assertBuildStatusSuccess(upstreamRun);
+
+        WorkflowRun run = createWorkflowJobAndRun(format("" +
+                "def runWrapper = selectRun job: '%s', " +
+                " selector: permalink('lastStableBuild'), " +
+                " verbose: true", projectName));
+
+        j.assertBuildStatusSuccess(run);
+    }
+
+    /**
+     * To use the @Symbol annotation in tests, minimum workflow-cps version 2.10 is required.
+     * This dependency comes with other dependency version requirements, as stated by this method.
+     * To run tests restricted by this method, type
+     * <pre>
+     *  mvn clean install -Djenkins.version=1.642.1 -Djava.level=7 -Dworkflow-step-api.version=2.3 -Dworkflow-support.version=2.2 -Dworkflow-job.version=2.4 -Dworkflow-basic-steps.version=2.1 -Dworkflow-cps.version=2.10
+     * </pre>
+     */
+    private static void assumeSymbolDependencies() {
+        assumeThat(System.getProperty("jenkins.version"), startsWith("1.642"));
+        assumeThat(System.getProperty("java.level"), is("7"));
+        assumeThat(System.getProperty("workflow-step-api.version"), is("2.3"));
+        assumeThat(System.getProperty("workflow-support.version"), is("2.2"));
+        assumeThat(System.getProperty("workflow-job.version"), is("2.4"));
+        assumeThat(System.getProperty("workflow-basic-steps.version"), is("2.1"));
+        assumeThat(System.getProperty("workflow-cps.version"), is("2.10"));
+    }
+
+    private static WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
         WorkflowJob job = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
         job.setDefinition(new CpsFlowDefinition(script));
         QueueTaskFuture<WorkflowRun> runFuture = job.scheduleBuild2(0);
