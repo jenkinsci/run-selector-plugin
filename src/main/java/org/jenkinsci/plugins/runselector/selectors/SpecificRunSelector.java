@@ -95,7 +95,7 @@ public class SpecificRunSelector extends AbstractSpecificRunSelector {
         return run;
     }
 
-    @Symbol("specificRun")
+    @Symbol("specific")
     @Extension(ordinal = -10)
     public static class DescriptorImpl extends RunSelectorDescriptor {
 

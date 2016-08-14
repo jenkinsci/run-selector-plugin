@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.runselector.steps;
 
 import hudson.model.Result;
 import hudson.model.queue.QueueTaskFuture;
+import hudson.util.VersionNumber;
 import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -14,12 +15,14 @@ import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.localizer.LocaleProvider;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 import static java.lang.String.format;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
@@ -128,7 +131,7 @@ public class SelectRunStepTest {
 
         WorkflowRun run = createWorkflowJobAndRun(format("" +
                 "def runWrapper = selectRun job: '%s', " +
-                " selector: status('Stable'), " +
+                " selector: status('STABLE'), " +
                 " verbose: true", projectName));
 
         j.assertBuildStatusSuccess(run);
@@ -144,7 +147,7 @@ public class SelectRunStepTest {
 
         WorkflowRun run = createWorkflowJobAndRun(format("" +
                 "def runWrapper = selectRun job: '%s', " +
-                " selector: specificRun('1'), " +
+                " selector: specific('1'), " +
                 " verbose: true", projectName));
 
         j.assertBuildStatusSuccess(run);
@@ -175,13 +178,24 @@ public class SelectRunStepTest {
      * </pre>
      */
     private static void assumeSymbolDependencies() {
-        assumeThat(System.getProperty("jenkins.version"), startsWith("1.642"));
-        assumeThat(System.getProperty("java.level"), is("7"));
-        assumeThat(System.getProperty("workflow-step-api.version"), is("2.3"));
-        assumeThat(System.getProperty("workflow-support.version"), is("2.2"));
-        assumeThat(System.getProperty("workflow-job.version"), is("2.4"));
-        assumeThat(System.getProperty("workflow-basic-steps.version"), is("2.1"));
-        assumeThat(System.getProperty("workflow-cps.version"), is("2.10"));
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("jenkins.version"), "1.642.1");
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("java.level"), "7");
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-step-api.version"), "2.3");
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-support.version"), "2.2");
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-job.version"), "2.4");
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-basic-steps.version"), "2.1");
+        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-cps.version"), "2.10");
+    }
+
+    /**
+     * Checks if the given property is not null, and if it's greater than or equal to the given version.
+     *
+     * @param property the property to be checked
+     * @param version  the version on which the property is checked against
+     */
+    private static void assumePropertyIsGreaterThanOrEqualTo(@CheckForNull String property, @Nonnull String version) {
+        assumeThat(property, notNullValue());
+        assumeThat(new VersionNumber(property).compareTo(new VersionNumber(version)), is(greaterThanOrEqualTo(0)));
     }
 
     private static WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
