@@ -24,292 +24,189 @@
 
 package org.jenkinsci.plugins.runselector;
 
-import hudson.model.FreeStyleBuild;
+import hudson.model.Cause;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
+import hudson.model.Run;
 import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
-import hudson.tasks.ArtifactArchiver;
-import hudson.util.IOUtils;
-import jenkins.util.VirtualFile;
+import hudson.model.TaskListener;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.selectors.ParameterizedRunSelector;
-import org.jenkinsci.plugins.runselector.testutils.CopyArtifactUtil;
-import org.jenkinsci.plugins.runselector.testutils.FileWriteBuilder;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests for {@link ParameterizedRunSelector}
- * 
- * @see CopyArtifactTest#testParameterizedRunSelector()
  */
-@Ignore
 public class ParameterizedRunSelectorTest {
+
     @ClassRule
     public static JenkinsRule j = new JenkinsRule();
-    
-    private WorkflowJob createWorkflowJob() throws IOException {
-        return j.jenkins.createProject(WorkflowJob.class, "test"+j.jenkins.getItems().size());
-    }
 
     /**
      * Should not cause a fatal error even for an undefined variable.
-     * 
-     * @throws Exception
      */
     @Issue("JENKINS-30357")
     @Test
     public void testUndefinedParameter() throws Exception {
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        FreeStyleProject copier = j.createFreeStyleProject();
-        
-        ParameterizedRunSelector pbs = new ParameterizedRunSelector("NosuchVariable");
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                copiee.getFullName(),
-                null,   // parameters
-                pbs,
-                "**/*", // filters
-                "",     // excludes
-                false,  // flatten
-                true,   // optional
-                false   // finterprintArtifacts
-        ));
-        FreeStyleBuild b = copier.scheduleBuild2(0).get();
-        j.assertBuildStatusSuccess(b);
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        FreeStyleProject selecter = j.createFreeStyleProject();
+
+        RunSelector selector = new ParameterizedRunSelector("NoSuchVariable");
+
+        Run run = selecter.scheduleBuild2(2).get();
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, nullValue());
     }
-    
+
     /**
      * Also applicable for workflow jobs.
-     * 
-     * @throws Exception
      */
     @Issue("JENKINS-30357")
     @Test
     public void testWorkflow() throws Exception {
-        // Prepare an artifact to be copied.
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        copiee.getBuildersList().add(new FileWriteBuilder("artifact.txt", "foobar"));
-        copiee.getPublishersList().add(new ArtifactArchiver("artifact.txt"));
-        j.assertBuildStatusSuccess(copiee.scheduleBuild2(0));
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
 
-        WorkflowJob copier = createWorkflowJob();
-        ParameterDefinition paramDef = new StringParameterDefinition("SELECTOR", "<StatusRunSelector><stable>true</stable></StatusRunSelector>");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        copier.addProperty(paramsDef);
-        copier.setDefinition(new CpsFlowDefinition(
-            String.format(
-                "node {"
-                    + "step([$class: 'RunSelector',"
-                        + "projectName: '%1$s',"
-                        + "filters: '**/*',"
-                        + "selectors: [$class: 'ParameterizedRunSelector', parameterName: 'SELECTOR'],"
-                    + "]);"
-                    + "step([$class: 'ArtifactArchiver', artifacts: '**/*']);"
-                + "}",
-                copiee.getFullName()
-            ),
-            true
-        ));
-        
-        WorkflowRun b = j.assertBuildStatusSuccess(copier.scheduleBuild2(
-                0,
-                null,
-                new ParametersAction(new StringParameterValue(
-                        "SELECTOR",
-                        "<StatusRunSelector><stable>true</stable></StatusRunSelector>"
-                ))
-        ));
-        
-        VirtualFile vf = b.getArtifactManager().root().child("artifact.txt");
-        assertEquals("foobar", IOUtils.toString(vf.open()));
+        WorkflowJob selecter = createWorkflowJob();
+
+        ParameterDefinition paramDef = new StringParameterDefinition(
+                "SELECTOR", "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>"
+        );
+        selecter.addProperty(new ParametersDefinitionProperty(paramDef));
+
+        selecter.setDefinition(new CpsFlowDefinition(String.format("" +
+                "def runWrapper = selectRun job: '%s', " +
+                " selector: [$class: 'ParameterizedRunSelector', parameterName: '${SELECTOR}'] \n" +
+                "assert(runWrapper.id == '%s')", jobToSelect.getFullName(), runToSelect.getId())));
+
+        j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));
     }
-    
+
     /**
      * Should not cause a fatal error even for a broken selectors.
-     * 
-     * @throws Exception
      */
     @Test
     public void testBrokenParameter() throws Exception {
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        FreeStyleProject copier = j.createFreeStyleProject();
-        
-        ParameterizedRunSelector pbs = new ParameterizedRunSelector("SELECTOR");
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                copiee.getFullName(),
-                null,   // parameters
-                pbs,
-                "**/*", // filters
-                "",     // excludes
-                false,  // flatten
-                true,   // optional
-                false   // finterprintArtifacts
-        ));
-        FreeStyleBuild b = (FreeStyleBuild) copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        FreeStyleProject selecter = j.createFreeStyleProject();
+
+        RunSelector selector = new ParameterizedRunSelector("${SELECTOR}");
+        Run run = (Run) selecter.scheduleBuild2(
                 0,
                 new ParametersAction(
-                    new StringParameterValue("SELECTOR", "<SomeBrokenSelector")
+                        new StringParameterValue("SELECTOR", "<SomeBrokenSelector")
                 )
         ).get();
-        j.assertBuildStatusSuccess(b);
+        j.assertBuildStatusSuccess(run);
+
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, nullValue());
     }
-    
+
     /**
      * Should not cause a fatal error even for an unavailable selectors.
-     * 
-     * @throws Exception
      */
     @Test
     public void testUnavailableSelector() throws Exception {
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        FreeStyleProject copier = j.createFreeStyleProject();
-        
-        ParameterizedRunSelector pbs = new ParameterizedRunSelector("SELECTOR");
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                copiee.getFullName(),
-                null,   // parameters
-                pbs,
-                "**/*", // filters
-                "",     // excludes
-                false,  // flatten
-                true,   // optional
-                false   // finterprintArtifacts
-        ));
-        FreeStyleBuild b = (FreeStyleBuild) copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        FreeStyleProject selecter = j.createFreeStyleProject();
+
+        RunSelector selector = new ParameterizedRunSelector("${SELECTOR}");
+        Run run = (Run) selecter.scheduleBuild2(
                 0,
                 new ParametersAction(
-                    new StringParameterValue("SELECTOR", "<NoSuchSelector />")
+                        new StringParameterValue("SELECTOR", "<NoSuchSelector />")
                 )
         ).get();
-        j.assertBuildStatusSuccess(b);
+        j.assertBuildStatusSuccess(run);
+
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, nullValue());
     }
-    
-    
+
     /**
      * Should not cause a fatal error even for an empty selectors.
-     * 
-     * @throws Exception
      */
     @Test
     public void testEmptySelector() throws Exception {
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        FreeStyleProject copier = j.createFreeStyleProject();
-        
-        ParameterizedRunSelector pbs = new ParameterizedRunSelector("SELECTOR");
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                copiee.getFullName(),
-                null,   // parameters
-                pbs,
-                "**/*", // filters
-                "",     // excludes
-                false,  // flatten
-                true,   // optional
-                false   // finterprintArtifacts
-        ));
-        FreeStyleBuild b = (FreeStyleBuild) copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        FreeStyleProject selecter = j.createFreeStyleProject();
+
+        RunSelector selector = new ParameterizedRunSelector("${SELECTOR}");
+        Run run = (Run) selecter.scheduleBuild2(
                 0,
                 new ParametersAction(
-                    new StringParameterValue("SELECTOR", "")
+                        new StringParameterValue("SELECTOR", "")
                 )
         ).get();
-        j.assertBuildStatusSuccess(b);
+        j.assertBuildStatusSuccess(run);
+
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, nullValue());
     }
-    
+
     /**
      * Also accepts immediate value.
-     * 
-     * @throws Exception
      */
     @Test
     public void testImmediateValue() throws Exception {
         // Prepare an artifact to be copied.
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        copiee.getBuildersList().add(new FileWriteBuilder("artifact.txt", "foobar"));
-        copiee.getPublishersList().add(new ArtifactArchiver("artifact.txt"));
-        j.assertBuildStatusSuccess(copiee.scheduleBuild2(0));
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
 
-        WorkflowJob copier = createWorkflowJob();
-        ParameterDefinition paramDef = new StringParameterDefinition("SELECTOR", "<StatusRunSelector><stable>true</stable></StatusRunSelector>");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        copier.addProperty(paramsDef);
-        copier.setDefinition(new CpsFlowDefinition(
-            String.format(
-                "node {"
-                    + "step([$class: 'RunSelector',"
-                        + "projectName: '%1$s',"
-                        + "filters: '**/*',"
-                        + "selectors: [$class: 'ParameterizedRunSelector', parameterName: '${SELECTOR}'],"
-                    + "]);"
-                    + "step([$class: 'ArtifactArchiver', artifacts: '**/*']);"
-                + "}",
-                copiee.getFullName()
-            ),
-            true
-        ));
-        
-        WorkflowRun b = j.assertBuildStatusSuccess(copier.scheduleBuild2(
+        WorkflowJob selecter = createWorkflowJob();
+        selecter.setDefinition(new CpsFlowDefinition(String.format("" +
+                "def runWrapper = selectRun job: '%s', " +
+                " selector: [$class: 'ParameterizedRunSelector', parameterName: '${SELECTOR}'] \n" +
+                "assert(runWrapper.id == '%s')", jobToSelect.getFullName(), runToSelect.getId())));
+
+        j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
                 null,
                 new ParametersAction(new StringParameterValue(
-                        "SELECTOR",
-                        "<StatusRunSelector><stable>true</stable></StatusRunSelector>"
+                        "SELECTOR", "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>"
                 ))
         ));
-        
-        VirtualFile vf = b.getArtifactManager().root().child("artifact.txt");
-        assertEquals("foobar", IOUtils.toString(vf.open()));
     }
-    
-    
+
     /**
      * Also accepts variable expression.
-     * 
-     * @throws Exception
      */
     @Test
     public void testVariableExpression() throws Exception {
-        // Prepare an artifact to be copied.
-        FreeStyleProject copiee = j.createFreeStyleProject();
-        copiee.getBuildersList().add(new FileWriteBuilder("artifact.txt", "foobar"));
-        copiee.getPublishersList().add(new ArtifactArchiver("artifact.txt"));
-        j.assertBuildStatusSuccess(copiee.scheduleBuild2(0));
-        
-        FreeStyleProject copier = j.createFreeStyleProject();
-        ParameterDefinition paramDef = new StringParameterDefinition("SELECTOR", "<StatusRunSelector><stable>true</stable></StatusRunSelector>");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        copier.addProperty(paramsDef);
-        ParameterizedRunSelector pbs = new ParameterizedRunSelector("${SELECTOR}");
-        copier.getBuildersList().add(CopyArtifactUtil.createRunSelector(
-                copiee.getFullName(),
-                null,   // parameters
-                pbs,
-                "**/*", // filters
-                "",     // excludes
-                false,  // flatten
-                false,  // optional
-                false   // finterprintArtifacts
-        ));
-        FreeStyleBuild b = j.assertBuildStatusSuccess((FreeStyleBuild)copier.scheduleBuild2(
+        FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
+
+        FreeStyleProject selecter = j.createFreeStyleProject();
+        RunSelector selector = new ParameterizedRunSelector("${SELECTOR}");
+
+        Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
+                (Cause) null,
                 new ParametersAction(new StringParameterValue(
                         "SELECTOR",
-                        "<StatusRunSelector><stable>true</stable></StatusRunSelector>"
+                        "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>"
                 ))
-        ).get());
-        
-        assertEquals("foobar", b.getWorkspace().child("artifact.txt").readToString());
+        ));
+        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, is(runToSelect));
     }
-    
+
+    private static WorkflowJob createWorkflowJob() throws IOException {
+        return j.jenkins.createProject(WorkflowJob.class, "test" + j.jenkins.getItems().size());
+    }
 }

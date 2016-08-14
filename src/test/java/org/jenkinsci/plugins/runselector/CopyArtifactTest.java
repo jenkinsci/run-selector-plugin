@@ -50,7 +50,6 @@ import jenkins.security.QueueItemAuthenticatorConfiguration;
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.jenkinsci.plugins.runselector.selectors.ParameterizedRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.PermalinkRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.SpecificRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.StatusRunSelector;
@@ -577,32 +576,6 @@ public class CopyArtifactTest {
         assertFile(true, "buildone.txt", b);
         assertFile(false, "subdir/subfoo.txt", b);
     }*/
-
-    @Test
-    public void testParameterizedRunSelector() throws Exception {
-        FreeStyleProject other = createArtifactProject(),
-                         p = rule.createFreeStyleProject();
-        ParameterDefinition pParamDef = new StringParameterDefinition("PBS", "foo");
-        ParametersDefinitionProperty pParamsDef = new ParametersDefinitionProperty(pParamDef);
-        p.addProperty(pParamsDef);
-        ParameterDefinition paramDef = new StringParameterDefinition("FOO", "foo");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        other.addProperty(paramsDef);
-        ParameterizedRunSelector pbs = new ParameterizedRunSelector("PBS");
-        assertEquals("PBS", pbs.getParameterName());
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), null, pbs, "*.txt", "", false, false, true));
-        FreeStyleBuild b = other.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("FOO", "buildone"))).get();
-        rule.assertBuildStatusSuccess(b);
-        rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()));
-        b.keepLog(true);
-        b = p.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("PBS", "<SavedRunSelector/>"))).get();
-        rule.assertBuildStatusSuccess(b);
-        assertFile(true, "foo.txt", b);
-        assertFile(true, "buildone.txt", b);
-        assertFile(false, "subdir/subfoo.txt", b);
-    }
 
    /* @Test
     public void testTriggeredRunSelector() throws Exception {

@@ -34,7 +34,6 @@ import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
 import org.jenkinsci.plugins.runselector.selectors.RunSelectorParameter;
 import org.jenkinsci.plugins.runselector.selectors.StatusRunSelector;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.CaptureEnvironmentBuilder;
@@ -48,10 +47,11 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Test interaction of RunSelectorParameter with Jenkins core.
+ *
  * @author Alan Harder
  */
-@Ignore
 public class RunSelectorParameterTest {
+
     @Rule
     public final JenkinsRule rule = new JenkinsRule();
 
@@ -81,16 +81,16 @@ public class RunSelectorParameterTest {
         if (q != null) q.getFuture().get();
         while (job.getLastBuild().isBuilding()) Thread.sleep(100);
         assertEquals("<SpecificRunSelector><buildNumber>6</buildNumber></SpecificRunSelector>",
-                     ceb.getEnvVars().get("SELECTOR").replaceAll("\\s+", ""));
+                ceb.getEnvVars().get("SELECTOR").replaceAll("\\s+", ""));
         job.getBuildersList().replace(ceb = new CaptureEnvironmentBuilder());
 
         // Run via HTTP POST (buildWithParameters)
         WebRequest post = new WebRequest(
-                new URL(rule.getURL(), job.getUrl()+"/buildWithParameters"), HttpMethod.POST);
+                new URL(rule.getURL(), job.getUrl() + "/buildWithParameters"), HttpMethod.POST);
         wc.addCrumb(post);
-        String xml = "<StatusRunSelector><stable>true</stable></StatusRunSelector>";
+        String xml = "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>";
         post.setRequestParameters(Arrays.asList(new NameValuePair("SELECTOR", xml),
-                                                post.getRequestParameters().get(0)));
+                post.getRequestParameters().get(0)));
         wc.getPage(post);
         q = rule.jenkins.getQueue().getItem(job);
         if (q != null) q.getFuture().get();
@@ -101,22 +101,22 @@ public class RunSelectorParameterTest {
         // Run via CLI
         CLI cli = new CLI(rule.getURL());
         assertEquals(0, cli.execute(
-                "build", job.getFullName(), "-p", "SELECTOR=<SavedRunSelector/>"));
+                "build", job.getFullName(), "-p", "SELECTOR=<StatusRunSelector/>"));
         q = rule.jenkins.getQueue().getItem(job);
         if (q != null) q.getFuture().get();
         while (job.getLastBuild().isBuilding()) Thread.sleep(100);
-        assertEquals("<SavedRunSelector/>", ceb.getEnvVars().get("SELECTOR"));
+        assertEquals("<StatusRunSelector/>", ceb.getEnvVars().get("SELECTOR"));
     }
-    
+
     @Test
     public void testConfiguration() throws Exception {
         RunSelectorParameter expected = new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "foo");
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(expected));
         job.save();
-        
+
         job = rule.configRoundtrip(job);
-        RunSelectorParameter actual = (RunSelectorParameter)job.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("SELECTOR");
+        RunSelectorParameter actual = (RunSelectorParameter) job.getProperty(ParametersDefinitionProperty.class).getParameterDefinition("SELECTOR");
         rule.assertEqualDataBoundBeans(expected, actual);
     }
 }
