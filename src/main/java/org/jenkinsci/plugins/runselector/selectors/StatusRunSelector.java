@@ -38,27 +38,40 @@ import javax.annotation.Nonnull;
 
 /**
  * Select build based on the specific status build.
+ *
  * @author Alan Harder
  */
 public class StatusRunSelector extends RunSelector {
     public enum BuildStatus {
-        /** Stable builds.*/
-        stable(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Stable()),
+        /**
+         * Stable builds.
+         */
+        STABLE(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Stable()),
 
-        /** Stable or Unstable builds.*/
-        successful(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Successful()),
+        /**
+         * Stable or Unstable builds.
+         */
+        SUCCESSFUL(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Successful()),
 
-        /** Unstable builds. */
-        unstable(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Unstable()),
+        /**
+         * Unstable builds.
+         */
+        UNSTABLE(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Unstable()),
 
-        /** Failed builds. */
-        failed(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Failed()),
+        /**
+         * Failed builds.
+         */
+        FAILED(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Failed()),
 
-        /** Completed builds with any build results.*/
-        completed(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Completed()),
+        /**
+         * Completed builds with any build results.
+         */
+        COMPLETED(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Completed()),
 
-        /** Any builds including incomplete (running) ones.*/
-        any(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Any());
+        /**
+         * Any builds including incomplete (running) ones.
+         */
+        ANY(org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_BuildStatus_Any());
 
         private final Localizable displayName;
 
@@ -75,7 +88,7 @@ public class StatusRunSelector extends RunSelector {
     private final BuildStatus buildStatus;
 
     public StatusRunSelector() {
-        this(BuildStatus.stable);
+        this(BuildStatus.STABLE);
     }
 
     /**
@@ -83,7 +96,7 @@ public class StatusRunSelector extends RunSelector {
      */
     @DataBoundConstructor
     public StatusRunSelector(@CheckForNull BuildStatus buildStatus) {
-        this.buildStatus = buildStatus != null ? buildStatus : BuildStatus.stable;
+        this.buildStatus = buildStatus != null ? buildStatus : BuildStatus.STABLE;
     }
 
     /**
@@ -103,59 +116,59 @@ public class StatusRunSelector extends RunSelector {
         Run<?, ?> previousBuild = context.getLastMatchBuild();
         if (previousBuild == null) {
             // the first time
-            switch(getBuildStatus()) {
-                case stable:
-                return job.getLastStableBuild();
-                case unstable:
-                return job.getLastUnstableBuild();
-                case failed:
-                return job.getLastFailedBuild();
-                case successful:
-                // really confusing, but in this case,
-                // "successful" means marked as SUCCESS or UNSTABLE.
-                return job.getLastSuccessfulBuild();
-                case completed:
-                return job.getLastCompletedBuild();
-                case any:
-                return job.getLastBuild();
+            switch (getBuildStatus()) {
+                case STABLE:
+                    return job.getLastStableBuild();
+                case UNSTABLE:
+                    return job.getLastUnstableBuild();
+                case FAILED:
+                    return job.getLastFailedBuild();
+                case SUCCESSFUL:
+                    // really confusing, but in this case,
+                    // "successful" means marked as SUCCESS or UNSTABLE.
+                    return job.getLastSuccessfulBuild();
+                case COMPLETED:
+                    return job.getLastCompletedBuild();
+                case ANY:
+                    return job.getLastBuild();
             }
         } else {
             // the second or later time
-            switch(getBuildStatus()) {
-                case stable:
-                // really confusing, but in this case,
-                // "successful" means marked as SUCCESS.
-                return previousBuild.getPreviousSuccessfulBuild();
-                case unstable:
-                for (
-                        previousBuild = previousBuild.getPreviousBuild();
-                        previousBuild != null;
-                        previousBuild = previousBuild.getPreviousBuild()
-                ) {
-                    Result r = previousBuild.getResult();
-                    if (Result.UNSTABLE.equals(r)) {
-                        return previousBuild;
+            switch (getBuildStatus()) {
+                case STABLE:
+                    // really confusing, but in this case,
+                    // "successful" means marked as SUCCESS.
+                    return previousBuild.getPreviousSuccessfulBuild();
+                case UNSTABLE:
+                    for (
+                            previousBuild = previousBuild.getPreviousBuild();
+                            previousBuild != null;
+                            previousBuild = previousBuild.getPreviousBuild()
+                            ) {
+                        Result r = previousBuild.getResult();
+                        if (Result.UNSTABLE.equals(r)) {
+                            return previousBuild;
+                        }
                     }
-                }
-                break;
-                case failed:
-                return previousBuild.getPreviousFailedBuild();
-                case successful:
-                for (
-                        previousBuild = previousBuild.getPreviousBuild();
-                        previousBuild != null;
-                        previousBuild = previousBuild.getPreviousBuild()
-                ) {
-                    Result r = previousBuild.getResult();
-                    if (r != null && r.isBetterOrEqualTo(Result.UNSTABLE)) {
-                        return previousBuild;
+                    break;
+                case FAILED:
+                    return previousBuild.getPreviousFailedBuild();
+                case SUCCESSFUL:
+                    for (
+                            previousBuild = previousBuild.getPreviousBuild();
+                            previousBuild != null;
+                            previousBuild = previousBuild.getPreviousBuild()
+                            ) {
+                        Result r = previousBuild.getResult();
+                        if (r != null && r.isBetterOrEqualTo(Result.UNSTABLE)) {
+                            return previousBuild;
+                        }
                     }
-                }
-                break;
-                case completed:
-                return previousBuild.getPreviousCompletedBuild();
-                case any:
-                return previousBuild.getPreviousBuild();
+                    break;
+                case COMPLETED:
+                    return previousBuild.getPreviousCompletedBuild();
+                case ANY:
+                    return previousBuild.getPreviousBuild();
             }
         }
         return null;
@@ -173,8 +186,8 @@ public class StatusRunSelector extends RunSelector {
         );
     }
 
-    @Extension(ordinal=100)
+    @Extension(ordinal = 100)
     public static final Descriptor<RunSelector> DESCRIPTOR =
             new SimpleRunSelectorDescriptor(
-                StatusRunSelector.class, org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_DisplayName());
+                    StatusRunSelector.class, org.jenkinsci.plugins.runselector.Messages._StatusRunSelector_DisplayName());
 }
