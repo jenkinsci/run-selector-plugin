@@ -24,6 +24,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Tests for {@link SpecificRunSelector}.
+ *
+ * @author Alexandru Somai
+ */
 public class SpecificRunSelectorTest {
 
     @ClassRule
