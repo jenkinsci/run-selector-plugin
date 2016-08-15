@@ -24,6 +24,7 @@
 
 package org.jenkinsci.plugins.runselector.selectors;
 
+import hudson.Util;
 import hudson.model.Job;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.RunSelector;
@@ -35,9 +36,22 @@ import java.io.IOException;
 
 /**
  * {@link RunSelector} enumerates only one build.
- * override {{@link #getBuild(Job, RunSelectorContext)} instead.
+ * Override {{@link #getBuild(Job, String)} instead.
  */
 public abstract class AbstractSpecificRunSelector extends RunSelector {
+
+    @Nonnull
+    private final String parameter;
+
+    protected AbstractSpecificRunSelector(String parameter) {
+        this.parameter = Util.fixNull(parameter).trim();
+    }
+
+    @Nonnull
+    protected String getParameter() {
+        return parameter;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -47,18 +61,31 @@ public abstract class AbstractSpecificRunSelector extends RunSelector {
         if (context.getLastMatchBuild() != null) {
             return null;
         }
-        return getBuild(job, context);
+
+        String resolvedParameter = context.getEnvVars().expand(parameter);
+        if (resolvedParameter.startsWith("$")) {
+            context.logDebug("Unresolved variable {0}", resolvedParameter);
+            return null;
+        }
+
+        Run<?, ?> run = getBuild(job, resolvedParameter);
+
+        if (run == null) {
+            context.logDebug("No such build {0} in {1}", parameter, job.getFullName());
+            return null;
+        }
+
+        return run;
     }
-    
+
     /**
      * Override this method to implement {@link AbstractSpecificRunSelector}.
-     * 
-     * @param job       the job to pick a build from.
-     * @param context   context for the current execution of runselector.
+     *
+     * @param job               the job to pick a build from
+     * @param resolvedParameter the parameter on which the search is performed
      * @return the build to select
-     * @throws IOException if an error occurs while performing the operation.
-     * @throws InterruptedException if any thread interrupts the current thread.
+     * @throws IOException if an error occurs while performing the operation
      */
     @CheckForNull
-    public abstract Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) throws IOException, InterruptedException;
+    public abstract Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull String resolvedParameter) throws IOException;
 }
