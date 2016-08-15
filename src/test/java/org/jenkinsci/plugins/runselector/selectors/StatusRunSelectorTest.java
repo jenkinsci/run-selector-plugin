@@ -34,6 +34,7 @@ public class StatusRunSelectorTest {
     private static WorkflowRun abortedRun;
 
     @BeforeClass
+    @SuppressWarnings("Duplicates")
     public static void setUp() throws Exception {
         jobToSelect = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
 

@@ -32,7 +32,6 @@ import hudson.util.ComboBoxModel;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
-import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -41,24 +40,31 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /**
- * Picks up a build through {@link Permalink}
+ * Picks up a build through {@link Permalink}.
  *
  * @author Kohsuke Kawaguchi
  */
 public class PermalinkRunSelector extends AbstractSpecificRunSelector {
-    public final String id;
 
     @DataBoundConstructor
     public PermalinkRunSelector(String id) {
-        this.id = id;
+        super(id);
+    }
+
+    @Nonnull
+    public String getId() {
+        return getParameter();
     }
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
-        Permalink p = job.getPermalinks().get(id);
-        if (p==null)    return null;
-        return p.resolve(job);
+    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull String resolvedParameter) {
+        Permalink permalink = job.getPermalinks().get(resolvedParameter);
+        if (permalink == null) {
+            return null;
+        }
+
+        return permalink.resolve(job);
     }
 
     @Symbol("permalink")

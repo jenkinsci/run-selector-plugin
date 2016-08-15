@@ -20,7 +20,8 @@ The **Run Selector** extension point has several implementations which can be us
    - `lastUnsuccessfulBuild`
    - `lastCompletedBuild`
  - **Triggering Run Selector** - selects the run that triggered this run (usually the upstream run)
- - **Specific Run Selector** - selects the run based on the given build number parameter
+ - **Build Number Run Selector** - selects the run based on the given build number parameter
+ - **Display Name Run Selector** - selects the run based on its display name
  - **Parameterized Run Selector** - selects the run based on a parameter
  - **Fallback Run Selector** - tries multiple selectors consequently
 
@@ -77,7 +78,7 @@ In the following example, the *UPSTREAM_BUILD_NUMBER* is a build parameter.
 
 ```groovy
 def runWrapper = selectRun job: 'upstream-project-name', 
- selector: specificRun(UPSTREAM_BUILD_NUMBER) 
+ selector: buildNumber(UPSTREAM_BUILD_NUMBER)
 ```
 
 ### Select the triggering build

@@ -106,22 +106,6 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void specificBuildNumberDoesNotExist() throws Exception {
-        WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
-        String projectName = upstreamRun.getParent().getFullName();
-        j.assertBuildStatusSuccess(upstreamRun);
-
-        WorkflowRun run = createWorkflowJobAndRun(format("" +
-                "def runWrapper = selectRun job: '%s', " +
-                " selector: [$class: 'SpecificRunSelector', buildNumber: '-1'], " +
-                " verbose: true", projectName));
-
-        j.assertBuildStatus(Result.FAILURE, run);
-        j.assertLogContains(format("no such build -1 in %s", projectName), run);
-        j.assertLogContains(format("ERROR: Unable to find Run for: %s, with selector: Specific build and filter: No Filter", projectName), run);
-    }
-
-    @Test
     public void testStatusSymbol() throws Exception {
         assumeSymbolDependencies();
 
@@ -147,7 +131,7 @@ public class SelectRunStepTest {
 
         WorkflowRun run = createWorkflowJobAndRun(format("" +
                 "def runWrapper = selectRun job: '%s', " +
-                " selector: specific('1'), " +
+                " selector: buildNumber('1'), " +
                 " verbose: true", projectName));
 
         j.assertBuildStatusSuccess(run);
