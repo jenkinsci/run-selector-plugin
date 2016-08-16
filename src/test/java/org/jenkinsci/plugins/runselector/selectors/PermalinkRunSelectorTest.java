@@ -127,7 +127,7 @@ public class PermalinkRunSelectorTest  {
                 )
         ));
         selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
-        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastSuccessfulBuild()));
+        assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastStableBuild()));
 
         run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
                 0,
