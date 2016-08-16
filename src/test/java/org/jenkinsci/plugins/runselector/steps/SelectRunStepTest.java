@@ -80,7 +80,7 @@ public class SelectRunStepTest {
                 "echo 'Selected run: ' + runWrapper.displayName", projectName));
 
         j.assertBuildStatusSuccess(run);
-        j.assertLogContains("Run Selector was not provided, using the default one: Latest specific status build (Stable)", run);
+        j.assertLogContains("Run Selector was not provided, using the default one: Latest specific status build (STABLE)", run);
         j.assertLogContains("Run Filter was not provided", run);
         j.assertLogContains("Selected run: #1", run);
     }
@@ -94,9 +94,9 @@ public class SelectRunStepTest {
         WorkflowRun run = createWorkflowJobAndRun(format("def runWrapper = selectRun '%s' ", projectName));
 
         j.assertBuildStatus(Result.FAILURE, run);
-        j.assertLogContains("Run Selector was not provided, using the default one: Latest specific status build (Stable)", run);
+        j.assertLogContains("Run Selector was not provided, using the default one: Latest specific status build (STABLE)", run);
         j.assertLogContains("Run Filter was not provided", run);
-        j.assertLogContains(format("ERROR: Unable to find Run for: %s, with selector: Latest specific status build (Stable) and filter: No Filter", projectName), run);
+        j.assertLogContains(format("ERROR: Unable to find Run for: %s, with selector: Latest specific status build (STABLE) and filter: No Filter", projectName), run);
     }
 
     @Test

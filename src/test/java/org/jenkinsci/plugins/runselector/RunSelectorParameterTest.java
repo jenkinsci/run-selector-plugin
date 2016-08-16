@@ -62,7 +62,7 @@ public class RunSelectorParameterTest {
     public void testParameter() throws Exception {
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(
-                new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.Successful), "foo")));
+                new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.SUCCESSFUL), "foo")));
         CaptureEnvironmentBuilder ceb = new CaptureEnvironmentBuilder();
         job.getBuildersList().add(ceb);
 
@@ -110,7 +110,7 @@ public class RunSelectorParameterTest {
     
     @Test
     public void testConfiguration() throws Exception {
-        RunSelectorParameter expected = new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.Stable), "foo");
+        RunSelectorParameter expected = new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "foo");
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(expected));
         job.save();

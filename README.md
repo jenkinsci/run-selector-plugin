@@ -52,11 +52,11 @@ def runWrapper = selectRun 'upstream-project-name'
 
 Alternatively, you can specify the `StatusRunSelector`. 
 For example, if you'd like to select the last successful build (stable or unstable), the value of the 
-`buildStatus` parameter has to be *Successful*:
+`buildStatus` parameter has to be *SUCCESSFUL*:
  
 ```groovy
 def runWrapper = selectRun job: 'upstream-project-name', 
- selector: [$class: 'StatusRunSelector', buildStatus: 'Successful'] 
+ selector: [$class: 'StatusRunSelector', buildStatus: 'SUCCESSFUL']
 ```
 The complete list of `buildStatus` values may be found in the Pipeline *Snippet Generator*.
 

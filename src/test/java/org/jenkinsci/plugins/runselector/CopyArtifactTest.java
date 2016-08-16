@@ -336,7 +336,7 @@ public class CopyArtifactTest {
                       p = createMatrixProject();
         p.setAxes(new AxisList(new Axis("FOO", "one", "two"))); // should match other job
         p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName() + "/FOO=$FOO", null,
-                new StatusRunSelector(StatusRunSelector.BuildStatus.Stable), "", "", false, false, true));
+                new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "", "", false, false, true));
         rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()).get());
         MatrixBuild b = p.scheduleBuild2(0, new UserCause()).get();
         rule.assertBuildStatusSuccess(b);
@@ -479,7 +479,7 @@ public class CopyArtifactTest {
     @Test
     public void testDefaultExcludes() throws Exception {
         FreeStyleProject other = rule.createFreeStyleProject(), p = rule.createFreeStyleProject();
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.Stable),
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE),
                 "", "", false, false));
         other.getBuildersList().add(new ArtifactBuilder());
         ArtifactArchiver aa = new ArtifactArchiver("**/*");
@@ -494,7 +494,7 @@ public class CopyArtifactTest {
     @Test
     public void testExcludes() throws Exception {
         FreeStyleProject other = rule.createFreeStyleProject(), p = rule.createFreeStyleProject();
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.Stable),
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE),
                 "**", ".hg/**", "", false, false, true));
         other.getBuildersList().add(new ArtifactBuilder());
         other.getPublishersList().add(new ArtifactArchiver("**/*"));
@@ -508,7 +508,7 @@ public class CopyArtifactTest {
     @Test
     public void testDefaultExcludesWithFlatten() throws Exception {
         FreeStyleProject other = rule.createFreeStyleProject(), p = rule.createFreeStyleProject();
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.Stable),
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE),
                 "", "", true, false));
         other.getBuildersList().add(new ArtifactBuilder());
         ArtifactArchiver aa = new ArtifactArchiver("**/*");
@@ -523,7 +523,7 @@ public class CopyArtifactTest {
     @Test
     public void testExcludesWithFlatten() throws Exception {
         FreeStyleProject other = rule.createFreeStyleProject(), p = rule.createFreeStyleProject();
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.Stable),
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(), "", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE),
                 "**", ".hg/**", "", true, false, true));
         other.getBuildersList().add(new ArtifactBuilder());
         other.getPublishersList().add(new ArtifactArchiver("**/*"));
@@ -1343,7 +1343,7 @@ public class CopyArtifactTest {
         FreeStyleProject p = folder2.createProject(FreeStyleProject.class, "bar");
 
         // "folder/foo" should be resolved as "/folder/foo" even from "/other/bar", for backward compatibility
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector("folder/foo", null, new StatusRunSelector(StatusRunSelector.BuildStatus.Stable), "", "", false, false, true));
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector("folder/foo", null, new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "", "", false, false, true));
 
         rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()).get());
         FreeStyleBuild b = p.scheduleBuild2(0, new UserCause()).get();
@@ -1359,7 +1359,7 @@ public class CopyArtifactTest {
 
         MockFolder folder = rule.jenkins.createProject(MockFolder.class, "folder");
         FreeStyleProject p = folder.createProject(FreeStyleProject.class, "bar");
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector("/foo", null, new StatusRunSelector(StatusRunSelector.BuildStatus.Stable), "", "", false, false, true));
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector("/foo", null, new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "", "", false, false, true));
 
         rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()).get());
         FreeStyleBuild b = p.scheduleBuild2(0, new UserCause()).get();
@@ -1375,7 +1375,7 @@ public class CopyArtifactTest {
 
         MockFolder folder = rule.jenkins.createProject(MockFolder.class, "folder");
         FreeStyleProject p = folder.createProject(FreeStyleProject.class, "bar");
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector("../foo", null, new StatusRunSelector(StatusRunSelector.BuildStatus.Stable), "", "", false, false, true));
+        p.getBuildersList().add(CopyArtifactUtil.createRunSelector("../foo", null, new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "", "", false, false, true));
 
         rule.assertBuildStatusSuccess(other.scheduleBuild2(0, new UserCause()).get());
         FreeStyleBuild b = p.scheduleBuild2(0, new UserCause()).get();
@@ -1757,7 +1757,7 @@ public class CopyArtifactTest {
         p1.getPublishersList().add(new ArtifactArchiver("**", "", false, false));
         rule.buildAndAssertSuccess(p1);
         FreeStyleProject p2 = rule.createFreeStyleProject("p2");
-        p2.getBuildersList().add(CopyArtifactUtil.createRunSelector("p1", null, new StatusRunSelector(StatusRunSelector.BuildStatus.Stable), null, "", false, false, true));
+        p2.getBuildersList().add(CopyArtifactUtil.createRunSelector("p1", null, new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), null, "", false, false, true));
         FreeStyleBuild b = rule.buildAndAssertSuccess(p2);
         FilePath ws = b.getWorkspace();
         assertEquals("text", ws.child("plain").readToString());
