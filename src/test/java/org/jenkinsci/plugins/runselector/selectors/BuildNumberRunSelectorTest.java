@@ -32,6 +32,7 @@ public class BuildNumberRunSelectorTest {
     private static FreeStyleProject jobToSelect;
 
     @BeforeClass
+    @SuppressWarnings("Duplicates")
     public static void setUp() throws Exception {
         jobToSelect = j.createFreeStyleProject();
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
