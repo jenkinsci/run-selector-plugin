@@ -604,31 +604,6 @@ public class CopyArtifactTest {
         assertFile(false, "subdir/subfoo.txt", b);
     }
 
-    @Test
-    public void testPermalinkRunSelector() throws Exception {
-        FreeStyleProject other = createArtifactProject(),
-                         p = rule.createFreeStyleProject();
-        ParameterDefinition paramDef = new StringParameterDefinition("FOO", "foo");
-        ParametersDefinitionProperty paramsDef = new ParametersDefinitionProperty(paramDef);
-        other.addProperty(paramsDef);
-        p.getBuildersList().add(CopyArtifactUtil.createRunSelector(other.getName(),
-                null, new PermalinkRunSelector("lastStableBuild"), "*.txt", "", false, false, true));
-        FreeStyleBuild b = other.scheduleBuild2(0, new UserCause(),
-                new ParametersAction(new StringParameterValue("FOO", "buildone"))).get();
-        rule.assertBuildStatusSuccess(b);
-        other.getBuildersList().add(new UnstableBuilder());
-        rule.assertBuildStatus(Result.UNSTABLE, other.scheduleBuild2(0, new UserCause()).get());
-        b = p.scheduleBuild2(0, new UserCause()).get();
-        rule.assertBuildStatusSuccess(b);
-        assertFile(true, "foo.txt", b);
-        assertFile(true, "buildone.txt", b);
-        assertFile(false, "subdir/subfoo.txt", b);
-        // Invalid permalink
-        p.getBuildersList().replace(CopyArtifactUtil.createRunSelector(other.getName(),
-                null, new PermalinkRunSelector("fooBuild"), "*.txt", "", false, false, true));
-        rule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0, new UserCause()).get());
-    }
-
    /* @Test
     public void testTriggeredRunSelector() throws Exception {
         FreeStyleProject other = createArtifactProject(),
