@@ -71,14 +71,14 @@ public class RunSelectorParameterTest {
         wco.setThrowExceptionOnFailingStatusCode(false);
         wco.setPrintContentOnFailingStatusCode(false);
         HtmlForm form = wc.getPage(job, "build").getFormByName("parameters");
-        form.getSelectByName("").getOptionByText("Specific build").setSelected(true);
+        form.getSelectByName("").getOptionByText("Specified by build number").setSelected(true);
         wc.waitForBackgroundJavaScript(10000);
         form.getInputByName("_.buildNumber").setValueAttribute("6");
         rule.submit(form);
         Queue.Item q = rule.jenkins.getQueue().getItem(job);
         if (q != null) q.getFuture().get();
         while (job.getLastBuild().isBuilding()) Thread.sleep(100);
-        assertEquals("<SpecificRunSelector><buildNumber>6</buildNumber></SpecificRunSelector>",
+        assertEquals("<BuildNumberRunSelector><buildNumber>6</buildNumber></BuildNumberRunSelector>",
                 ceb.getEnvVars().get("SELECTOR").replaceAll("\\s+", ""));
         job.getBuildersList().replace(ceb = new CaptureEnvironmentBuilder());
 

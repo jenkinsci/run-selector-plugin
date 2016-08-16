@@ -25,6 +25,7 @@ package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.Job;
 import hudson.model.PermalinkProjectAction.Permalink;
 import hudson.model.Run;
@@ -32,6 +33,7 @@ import hudson.util.ComboBoxModel;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
+import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -46,25 +48,41 @@ import javax.annotation.Nonnull;
  */
 public class PermalinkRunSelector extends AbstractSpecificRunSelector {
 
+    @Nonnull
+    private final String id;
+
     @DataBoundConstructor
     public PermalinkRunSelector(String id) {
-        super(id);
+        this.id = Util.fixNull(id).trim();
     }
 
     @Nonnull
     public String getId() {
-        return getParameter();
+        return id;
     }
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull String resolvedParameter) {
-        Permalink permalink = job.getPermalinks().get(resolvedParameter);
-        if (permalink == null) {
+    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
+        String resolvedId = context.getEnvVars().expand(id);
+        if (resolvedId.startsWith("$")) {
+            context.logDebug("Unresolved variable {0}", resolvedId);
             return null;
         }
 
-        return permalink.resolve(job);
+        Permalink p = job.getPermalinks().get(resolvedId);
+        if (p == null) {
+            context.logDebug("No permalink found for {0}", resolvedId);
+            return null;
+        }
+
+        Run<?, ?> run = p.resolve(job);
+        if (run == null) {
+            context.logDebug("No such build {0} in {1}", id, job.getFullName());
+            return null;
+        }
+
+        return run;
     }
 
     @Symbol("permalink")

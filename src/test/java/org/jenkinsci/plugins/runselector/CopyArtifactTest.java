@@ -51,7 +51,6 @@ import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.jenkinsci.plugins.runselector.selectors.BuildNumberRunSelector;
-import org.jenkinsci.plugins.runselector.selectors.ParameterizedRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.PermalinkRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.StatusRunSelector;
 import org.jenkinsci.plugins.runselector.testutils.CopyArtifactUtil;
