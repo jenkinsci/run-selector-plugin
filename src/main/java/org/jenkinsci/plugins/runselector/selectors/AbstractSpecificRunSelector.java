@@ -49,14 +49,14 @@ public abstract class AbstractSpecificRunSelector extends RunSelector {
         }
         return getBuild(job, context);
     }
-    
+
     /**
      * Override this method to implement {@link AbstractSpecificRunSelector}.
-     * 
-     * @param job       the job to pick a build from.
-     * @param context   context for the current execution of runselector.
+     *
+     * @param job     the job to pick a build from.
+     * @param context context for the current execution of runselector.
      * @return the build to select
-     * @throws IOException if an error occurs while performing the operation.
+     * @throws IOException          if an error occurs while performing the operation.
      * @throws InterruptedException if any thread interrupts the current thread.
      */
     @CheckForNull

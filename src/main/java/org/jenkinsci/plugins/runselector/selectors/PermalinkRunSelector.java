@@ -25,6 +25,7 @@ package org.jenkinsci.plugins.runselector.selectors;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.Job;
 import hudson.model.PermalinkProjectAction.Permalink;
 import hudson.model.Run;
@@ -41,24 +42,47 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /**
- * Picks up a build through {@link Permalink}
+ * Picks up a build through {@link Permalink}.
  *
  * @author Kohsuke Kawaguchi
  */
 public class PermalinkRunSelector extends AbstractSpecificRunSelector {
-    public final String id;
+
+    @Nonnull
+    private final String id;
 
     @DataBoundConstructor
     public PermalinkRunSelector(String id) {
-        this.id = id;
+        this.id = Util.fixNull(id).trim();
+    }
+
+    @Nonnull
+    public String getId() {
+        return id;
     }
 
     @Override
     @CheckForNull
     public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
-        Permalink p = job.getPermalinks().get(id);
-        if (p==null)    return null;
-        return p.resolve(job);
+        String resolvedId = context.getEnvVars().expand(id);
+        if (resolvedId.startsWith("$")) {
+            context.logDebug("Unresolved variable {0}", resolvedId);
+            return null;
+        }
+
+        Permalink p = job.getPermalinks().get(resolvedId);
+        if (p == null) {
+            context.logDebug("No permalink found for {0}", resolvedId);
+            return null;
+        }
+
+        Run<?, ?> run = p.resolve(job);
+        if (run == null) {
+            context.logDebug("No such build {0} in {1}", id, job.getFullName());
+            return null;
+        }
+
+        return run;
     }
 
     @Symbol("permalink")
