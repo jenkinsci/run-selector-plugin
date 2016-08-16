@@ -57,22 +57,6 @@ public class ParameterizedRunSelectorTest {
     public static JenkinsRule j = new JenkinsRule();
 
     /**
-     * Should not cause a fatal error even for an undefined variable.
-     */
-    @Issue("JENKINS-30357")
-    @Test
-    public void testUndefinedParameter() throws Exception {
-        FreeStyleProject jobToSelect = j.createFreeStyleProject();
-        FreeStyleProject selecter = j.createFreeStyleProject();
-
-        RunSelector selector = new ParameterizedRunSelector("NoSuchVariable");
-
-        Run run = selecter.scheduleBuild2(2).get();
-        Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
-        assertThat(selectedRun, nullValue());
-    }
-
-    /**
      * Also applicable for workflow jobs.
      */
     @Issue("JENKINS-30357")
@@ -84,7 +68,7 @@ public class ParameterizedRunSelectorTest {
         WorkflowJob selecter = createWorkflowJob();
 
         ParameterDefinition paramDef = new StringParameterDefinition(
-                "SELECTOR", "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>"
+                "SELECTOR", "<StatusRunSelector><buildStatus>STABLE</buildStatus></StatusRunSelector>"
         );
         selecter.addProperty(new ParametersDefinitionProperty(paramDef));
 
@@ -178,7 +162,7 @@ public class ParameterizedRunSelectorTest {
                 0,
                 null,
                 new ParametersAction(new StringParameterValue(
-                        "SELECTOR", "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>"
+                        "SELECTOR", "<StatusRunSelector><buildStatus>STABLE</buildStatus></StatusRunSelector>"
                 ))
         ));
     }
@@ -199,7 +183,7 @@ public class ParameterizedRunSelectorTest {
                 (Cause) null,
                 new ParametersAction(new StringParameterValue(
                         "SELECTOR",
-                        "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>"
+                        "<StatusRunSelector><buildStatus>STABLE</buildStatus></StatusRunSelector>"
                 ))
         ));
         Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));

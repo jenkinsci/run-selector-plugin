@@ -86,7 +86,7 @@ public class RunSelectorParameterTest {
         WebRequest post = new WebRequest(
                 new URL(rule.getURL(), job.getUrl() + "/buildWithParameters"), HttpMethod.POST);
         wc.addCrumb(post);
-        String xml = "<StatusRunSelector><buildStatus>Stable</buildStatus></StatusRunSelector>";
+        String xml = "<StatusRunSelector><buildStatus>STABLE</buildStatus></StatusRunSelector>";
         post.setRequestParameters(Arrays.asList(new NameValuePair("SELECTOR", xml),
                 post.getRequestParameters().get(0)));
         wc.getPage(post);
