@@ -50,8 +50,8 @@ import jenkins.security.QueueItemAuthenticatorConfiguration;
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.jenkinsci.plugins.runselector.selectors.BuildNumberRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.PermalinkRunSelector;
-import org.jenkinsci.plugins.runselector.selectors.SpecificRunSelector;
 import org.jenkinsci.plugins.runselector.selectors.StatusRunSelector;
 import org.jenkinsci.plugins.runselector.testutils.CopyArtifactUtil;
 import org.jenkinsci.plugins.runselector.testutils.FileWriteBuilder;
@@ -954,7 +954,7 @@ public class CopyArtifactTest {
         downstream.getPrebuilders().add(CopyArtifactUtil.createRunSelector(
                 "upstream",
                 "",
-                new SpecificRunSelector(Integer.toString(upstreamBuild.getNumber())),
+                new BuildNumberRunSelector(Integer.toString(upstreamBuild.getNumber())),
                 "**/*",
                 "",
                 "",
@@ -987,7 +987,7 @@ public class CopyArtifactTest {
         downstream.getBuildersList().add(new WrapperBuilder(CopyArtifactUtil.createRunSelector(
                 "upstream",
                 "",
-                new SpecificRunSelector(Integer.toString(upstreamBuild.getNumber())),
+                new BuildNumberRunSelector(Integer.toString(upstreamBuild.getNumber())),
                 "**/*",
                 "",
                 "",
@@ -1586,7 +1586,7 @@ public class CopyArtifactTest {
             p.getBuildersList().add(CopyArtifactUtil.createRunSelector(
                     copiee.getFullName(),
                     "",
-                    new SpecificRunSelector(Integer.toString(copieeBuild.getNumber())),
+                    new BuildNumberRunSelector(Integer.toString(copieeBuild.getNumber())),
                     "",
                     "",
                     "",
@@ -1613,7 +1613,7 @@ public class CopyArtifactTest {
             p.getBuildersList().add(CopyArtifactUtil.createRunSelector(
                     copiee.getFullName(),
                     "",
-                    new SpecificRunSelector(Integer.toString(copieeBuild.getNumber())),
+                    new BuildNumberRunSelector(Integer.toString(copieeBuild.getNumber())),
                     "",
                     "",
                     "",
@@ -1642,7 +1642,7 @@ public class CopyArtifactTest {
             p.getBuildersList().add(CopyArtifactUtil.createRunSelector(
                     copiee.getFullName(),
                     "",
-                    new SpecificRunSelector(Integer.toString(copieeBuild.getNumber())),
+                    new BuildNumberRunSelector(Integer.toString(copieeBuild.getNumber())),
                     "",
                     "",
                     "",
@@ -1669,7 +1669,7 @@ public class CopyArtifactTest {
             p.getBuildersList().add(CopyArtifactUtil.createRunSelector(
                     copiee.getFullName(),
                     "",
-                    new SpecificRunSelector(Integer.toString(copieeBuild.getNumber())),
+                    new BuildNumberRunSelector(Integer.toString(copieeBuild.getNumber())),
                     "",
                     "",
                     "",
