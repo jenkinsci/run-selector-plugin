@@ -56,7 +56,7 @@ For example, if you'd like to select the last successful build (stable or unstab
  
 ```groovy
 def runWrapper = selectRun job: 'upstream-project-name', 
- selector: [$class: 'StatusRunSelector', buildStatus: 'SUCCESSFUL']
+ selector: status('SUCCESSFUL') 
 ```
 The complete list of `buildStatus` values may be found in the Pipeline *Snippet Generator*.
 
@@ -65,7 +65,7 @@ For example, the permalink for selecting the last unstable build is *lastUnstabl
 
 ```groovy
 def runWrapper = selectRun job: 'upstream-project-name', 
- selector: [$class: 'PermalinkRunSelector', id: 'lastUnstableBuild'] 
+ selector: permalink('lastUnstableBuild') 
 ```
 
 The complete list of *Permalink* `id` values may be found in the Pipeline *Snippet Generator*. 
@@ -77,7 +77,7 @@ In the following example, the *UPSTREAM_BUILD_NUMBER* is a build parameter.
 
 ```groovy
 def runWrapper = selectRun job: 'upstream-project-name', 
- selector: [$class: 'SpecificRunSelector', buildNumber: UPSTREAM_BUILD_NUMBER] 
+ selector: specificRun(UPSTREAM_BUILD_NUMBER) 
 ```
 
 ### Select the triggering build
@@ -92,7 +92,7 @@ A possible solution to select the run that triggered your downstream job is by u
 
 ```groovy
 def runWrapper = selectRun job: 'upstream-project-name', 
- selector: [$class: 'TriggeringRunSelector'] 
+ selector: triggering() 
 ```
 
 Of course you could instead (and more explicitly) have the upstream build pass `currentBuild.number` as a build parameter.

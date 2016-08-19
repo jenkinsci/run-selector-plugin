@@ -32,6 +32,7 @@ import hudson.model.Run;
 import hudson.util.XStream2;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
@@ -125,6 +126,7 @@ public class ParameterizedRunFilter extends RunFilter {
     /**
      * the descriptor for {@link ParameterizedRunFilter}
      */
+    @Symbol("parameterized")
     @Extension
     public static class DescriptorImpl extends RunFilterDescriptor {
         /**

@@ -25,6 +25,7 @@ package org.jenkinsci.plugins.runselector.filters;
 
 import hudson.Extension;
 import hudson.model.Run;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
@@ -49,6 +50,7 @@ public class SavedRunFilter extends RunFilter {
     /**
      * the descriptor for {@link SavedRunFilter}
      */
+    @Symbol("saved")
     @Extension
     public static class DescriptorImpl extends RunFilterDescriptor {
         /**

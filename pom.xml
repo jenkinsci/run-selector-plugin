@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.9</version>
+        <version>2.13</version>
     </parent>
 
     <artifactId>run-selector</artifactId>
@@ -32,26 +32,35 @@
     <properties>
         <jenkins.version>1.580.1</jenkins.version>
         <java.level>6</java.level>
-        <workflow.version>1.4.2</workflow.version>
+        <workflow-step-api.version>1.4.2</workflow-step-api.version>
+        <workflow-support.version>1.4.2</workflow-support.version>
+        <workflow-job.version>1.4.2</workflow-job.version>
+        <workflow-basic-steps.version>1.4.2</workflow-basic-steps.version>
+        <workflow-cps.version>1.4.2</workflow-cps.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-step-api</artifactId>
-            <version>${workflow.version}</version>
+            <groupId>org.jenkins-ci</groupId>
+            <artifactId>symbol-annotation</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
-            <version>${workflow.version}</version>
+            <version>${workflow-step-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-step-api</artifactId>
+            <version>${workflow-step-api.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-support</artifactId>
-            <version>${workflow.version}</version>
+            <version>${workflow-support.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -103,19 +112,19 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-job</artifactId>
-            <version>${workflow.version}</version>
+            <version>${workflow-job.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-basic-steps</artifactId>
-            <version>${workflow.version}</version>
+            <version>${workflow-basic-steps.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-cps</artifactId>
-            <version>${workflow.version}</version>
+            <version>${workflow-cps.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
