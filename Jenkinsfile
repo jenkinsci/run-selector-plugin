@@ -12,6 +12,11 @@ node {
   /* Call the maven build */
   mvn 'clean install -B -V'
 
+  stage 'Build extended'
+
+  /* Call the maven build again, that will trigger additional tests */
+  mvn 'clean install -B -V -Djenkins.version=1.642.1 -Djava.level=7 -Dworkflow-step-api.version=2.3 -Dworkflow-support.version=2.2 -Dworkflow-job.version=2.4 -Dworkflow-basic-steps.version=2.1 -Dworkflow-cps.version=2.10'
+
   /* Save Results */
   stage 'Results'
 
