@@ -42,7 +42,6 @@ import org.jenkinsci.plugins.runselector.RunSelector;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
