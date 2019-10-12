@@ -30,7 +30,6 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.Run;
 import hudson.util.XStream2;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunFilter;
@@ -113,11 +112,6 @@ public class ParameterizedRunFilter extends RunFilter {
      */
     @Initializer(after=InitMilestone.PLUGINS_STARTED)
     public static void initAliases() {
-        Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            LOGGER.severe("Called for initialization but Jenkins instance no longer available.");
-            return;
-        }
         for (RunFilterDescriptor d : RunFilter.all()) {
             XSTREAM.alias(d.clazz.getSimpleName(), d.clazz);
         }

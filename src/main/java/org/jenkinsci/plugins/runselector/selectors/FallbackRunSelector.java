@@ -114,9 +114,6 @@ public class FallbackRunSelector extends RunSelector {
              */
             public Iterable<? extends Descriptor<? extends RunSelector>> getRunSelectorDescriptorList() {
                 Jenkins jenkins = Jenkins.getInstance();
-                if (jenkins == null) {
-                    return Collections.emptyList();
-                }
                 // remove FallbackRunSelector itself.
                 return Iterables.filter(
                         jenkins.getDescriptorList(RunSelector.class),

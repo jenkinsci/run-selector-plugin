@@ -67,9 +67,6 @@ public abstract class RunFilter extends AbstractDescribableImpl<RunFilter> imple
      */
     public static List<RunFilterDescriptor> all() {
         Jenkins j = Jenkins.getInstance();
-        if (j == null) {
-            return Collections.emptyList();
-        }
         return Lists.transform(
                 j.getDescriptorList(RunFilter.class),
                 new Function<Descriptor<?>, RunFilterDescriptor>() {

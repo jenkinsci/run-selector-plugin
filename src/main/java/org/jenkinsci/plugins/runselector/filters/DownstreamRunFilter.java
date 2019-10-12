@@ -212,10 +212,6 @@ public class DownstreamRunFilter extends RunFilter {
             }
             
             Jenkins jenkins = Jenkins.getInstance();
-            if (jenkins == null) {
-                // Jenkins is unavailable and validation is useless.
-                return FormValidation.ok();
-            }
 
             if (project == null) {
                 // Context is unknown and validation is useless.
@@ -277,10 +273,6 @@ public class DownstreamRunFilter extends RunFilter {
             }
             
             Jenkins jenkins = Jenkins.getInstance();
-            if (jenkins == null) {
-                // Jenkins is unavailable and validation is useless.
-                return FormValidation.ok();
-            }
 
             if (project == null) {
                 // Context is unknown and validation is useless.
