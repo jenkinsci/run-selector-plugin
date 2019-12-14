@@ -48,7 +48,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -114,9 +113,6 @@ public class FallbackRunSelector extends RunSelector {
              */
             public Iterable<? extends Descriptor<? extends RunSelector>> getRunSelectorDescriptorList() {
                 Jenkins jenkins = Jenkins.getInstance();
-                if (jenkins == null) {
-                    return Collections.emptyList();
-                }
                 // remove FallbackRunSelector itself.
                 return Iterables.filter(
                         jenkins.getDescriptorList(RunSelector.class),

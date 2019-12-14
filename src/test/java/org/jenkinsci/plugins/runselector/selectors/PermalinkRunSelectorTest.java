@@ -3,8 +3,10 @@ package org.jenkinsci.plugins.runselector.selectors;
 import hudson.model.Cause;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
+import hudson.model.ParametersDefinitionProperty;
 import hudson.model.PermalinkProjectAction;
 import hudson.model.Run;
+import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import org.apache.commons.lang.RandomStringUtils;
@@ -107,6 +109,9 @@ public class PermalinkRunSelectorTest  {
     @Test
     public void testPermalinkSelectorParameter() throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
+        selecter.addProperty(new ParametersDefinitionProperty(
+                new StringParameterDefinition("NUM", "")
+        ));
         RunSelector selector = new PermalinkRunSelector("$NUM");
 
         Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(

@@ -1,10 +1,13 @@
 package org.jenkinsci.plugins.runselector.filters;
 
 import hudson.model.Cause;
+import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersAction;
+import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Result;
 import hudson.model.Run;
+import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import org.apache.commons.lang.RandomStringUtils;
@@ -21,6 +24,7 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -43,7 +47,9 @@ public class DisplayNameRunFilterTest {
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
+        FreeStyleBuild lastBuild = jobToSelect.getLastBuild();
+        assertThat(lastBuild, notNullValue());
+        assertThat(lastBuild.getNumber(), is(3));
     }
 
     @Test
@@ -51,6 +57,10 @@ public class DisplayNameRunFilterTest {
         jobToSelect.getBuildByNumber(2).setDisplayName("RC1");
 
         FreeStyleProject selecter = j.createFreeStyleProject();
+        selecter.addProperty(new ParametersDefinitionProperty(
+                new StringParameterDefinition("NUM", "")
+        ));
+
         RunSelector selector = new StatusRunSelector();
         RunFilter filter = new DisplayNameRunFilter("$NUM");
 
@@ -62,6 +72,7 @@ public class DisplayNameRunFilterTest {
                 )
         ));
         Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL, filter));
+        assertThat(selectedRun, notNullValue());
         assertThat(selectedRun.getNumber(), is(2));
 
         run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(

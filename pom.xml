@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.13</version>
+        <version>3.18</version>
     </parent>
 
     <artifactId>run-selector</artifactId>
@@ -30,20 +30,20 @@
     </developers>
 
     <properties>
-        <jenkins.version>1.580.1</jenkins.version>
-        <java.level>6</java.level>
-        <workflow-step-api.version>1.4.2</workflow-step-api.version>
-        <workflow-support.version>1.4.2</workflow-support.version>
-        <workflow-job.version>1.4.2</workflow-job.version>
-        <workflow-basic-steps.version>1.4.2</workflow-basic-steps.version>
-        <workflow-cps.version>1.4.2</workflow-cps.version>
+        <jenkins.version>2.60.3</jenkins.version>
+        <java.level>8</java.level>
+        <workflow-step-api.version>2.3</workflow-step-api.version>
+        <workflow-support.version>2.2</workflow-support.version>
+        <workflow-job.version>2.5</workflow-job.version>
+        <workflow-basic-steps.version>2.1</workflow-basic-steps.version>
+        <workflow-cps.version>2.11</workflow-cps.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.jenkins-ci</groupId>
             <artifactId>symbol-annotation</artifactId>
-            <version>1.1</version>
+            <version>1.10</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <version>2.7.1</version>
+            <version>3.1.2</version>
             <optional>true</optional>
             <scope>test</scope>
             <exclusions>
@@ -87,6 +87,11 @@
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpcore</artifactId>
+                </exclusion>
+                <!-- to avoid RequireUpperBoundDeps with workflow-basic-steps -->
+                <exclusion>
+                    <groupId>org.jenkins-ci.plugins</groupId>
+                    <artifactId>mailer</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

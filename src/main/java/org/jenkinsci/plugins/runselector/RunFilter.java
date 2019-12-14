@@ -35,7 +35,6 @@ import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,9 +66,6 @@ public abstract class RunFilter extends AbstractDescribableImpl<RunFilter> imple
      */
     public static List<RunFilterDescriptor> all() {
         Jenkins j = Jenkins.getInstance();
-        if (j == null) {
-            return Collections.emptyList();
-        }
         return Lists.transform(
                 j.getDescriptorList(RunFilter.class),
                 new Function<Descriptor<?>, RunFilterDescriptor>() {

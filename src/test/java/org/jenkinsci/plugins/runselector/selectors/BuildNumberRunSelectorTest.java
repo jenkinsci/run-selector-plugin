@@ -16,6 +16,7 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -38,7 +39,9 @@ public class BuildNumberRunSelectorTest {
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(3));
+        FreeStyleBuild lastBuild = jobToSelect.getLastBuild();
+        assertThat(lastBuild, notNullValue());
+        assertThat(lastBuild.getNumber(), is(3));
     }
 
     @Test
@@ -49,6 +52,7 @@ public class BuildNumberRunSelectorTest {
 
         Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));
         Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, notNullValue());
         assertThat(selectedRun.getNumber(), is(1));
     }
 
@@ -61,16 +65,23 @@ public class BuildNumberRunSelectorTest {
 
         Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));
         Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, notNullValue());
         assertThat(selectedRun.getNumber(), is(1));
     }
 
     @Test
     public void testBuildNumberSelectorWithParameterFilter() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
+        jobToSelect.addProperty(new ParametersDefinitionProperty(
+                new StringParameterDefinition("FOO", "")
+        ));
+
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0, (Cause) null,
                 new ParametersAction(new StringParameterValue("FOO", "foo"))));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
-        assertThat(jobToSelect.getLastBuild().getNumber(), is(2));
+        FreeStyleBuild lastBuild = jobToSelect.getLastBuild();
+        assertThat(lastBuild, notNullValue());
+        assertThat(lastBuild.getNumber(), is(2));
 
         FreeStyleProject selecter = j.createFreeStyleProject();
         RunSelector selector = new BuildNumberRunSelector("1");
@@ -83,6 +94,7 @@ public class BuildNumberRunSelectorTest {
         runFilter = new ParametersRunFilter("FOO=foo");
         run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));
         selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL, runFilter));
+        assertThat(selectedRun, notNullValue());
         assertThat(selectedRun.getNumber(), is(1));
     }
 
@@ -90,6 +102,9 @@ public class BuildNumberRunSelectorTest {
     @Test
     public void testUnsetVar() throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
+        selecter.addProperty(new ParametersDefinitionProperty(
+                new StringParameterDefinition("NUM", "")
+        ));
         RunSelector selector = new BuildNumberRunSelector("$NUM");
 
         Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(
@@ -100,6 +115,7 @@ public class BuildNumberRunSelectorTest {
                 )
         ));
         Run selectedRun = selector.select(jobToSelect, new RunSelectorContext(j.jenkins, run, TaskListener.NULL));
+        assertThat(selectedRun, notNullValue());
         assertThat(selectedRun.getNumber(), is(2));
 
         run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(

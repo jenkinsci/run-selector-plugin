@@ -148,11 +148,14 @@ public class ParameterizedRunSelectorTest {
      */
     @Test
     public void testImmediateValue() throws Exception {
-        // Prepare an artifact to be copied.
+        // Prepare a job to be selected.
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
 
         WorkflowJob selecter = createWorkflowJob();
+        selecter.addProperty(new ParametersDefinitionProperty(
+                new StringParameterDefinition("SELECTOR", "")
+        ));
         selecter.setDefinition(new CpsFlowDefinition(String.format("" +
                 "def runWrapper = selectRun job: '%s', " +
                 " selector: [$class: 'ParameterizedRunSelector', parameterName: '${SELECTOR}'] \n" +
@@ -176,6 +179,9 @@ public class ParameterizedRunSelectorTest {
         Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
 
         FreeStyleProject selecter = j.createFreeStyleProject();
+        selecter.addProperty(new ParametersDefinitionProperty(
+                new StringParameterDefinition("SELECTOR", "")
+        ));
         RunSelector selector = new ParameterizedRunSelector("${SELECTOR}");
 
         Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(

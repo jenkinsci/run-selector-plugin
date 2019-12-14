@@ -42,7 +42,6 @@ import org.jenkinsci.plugins.runselector.RunSelector;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -104,10 +103,7 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
 
         public DescriptorExtensionList<RunSelector,Descriptor<RunSelector>> getRunSelectors() {
             Jenkins jenkins = Jenkins.getInstance();
-            if (jenkins == null) {
-                return DescriptorExtensionList.createDescriptorList((Jenkins)null, RunSelector.class);
-            }
-            return jenkins.<RunSelector,Descriptor<RunSelector>>getDescriptorList(RunSelector.class);
+            return jenkins.getDescriptorList(RunSelector.class);
         }
 
         /**
@@ -115,9 +111,6 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
          */
         public List<Descriptor<RunSelector>> getAvailableRunSelectorList() {
             Jenkins jenkins = Jenkins.getInstance();
-            if (jenkins == null) {
-                return Collections.emptyList();
-            }
             return Lists.newArrayList(Collections2.filter(
                     jenkins.getDescriptorList(RunSelector.class),
                     new Predicate<Descriptor<RunSelector>>() {
@@ -134,10 +127,6 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
     @Initializer(after = InitMilestone.PLUGINS_STARTED)
     public static void initAliases() {
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            LOGGER.severe("Called for initialization but Jenkins instance no longer available.");
-            return;
-        }
         // Alias all RunSelectors to their simple names
         for (Descriptor<RunSelector> d : jenkins.getDescriptorByType(DescriptorImpl.class).getRunSelectors())
             XSTREAM.alias(d.clazz.getSimpleName(), d.clazz);
