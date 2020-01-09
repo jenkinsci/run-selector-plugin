@@ -10,7 +10,7 @@
     <artifactId>run-selector</artifactId>
     <packaging>hpi</packaging>
     <name>Run Selector Plugin</name>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1</version>
     <url>https://github.com/jenkinsci/run-selector-plugin</url>
 
     <licenses>
@@ -155,7 +155,7 @@
             scm:git:ssh://git@github.com/jenkinsci/${project.artifactId}-plugin.git
         </developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-        <tag>HEAD</tag>
+        <tag>run-selector-1.1.1</tag>
     </scm>
 
     <repositories>
