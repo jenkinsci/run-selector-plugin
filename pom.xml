@@ -36,7 +36,7 @@
         <workflow-support.version>2.2</workflow-support.version>
         <workflow-job.version>2.5</workflow-job.version>
         <workflow-basic-steps.version>2.1</workflow-basic-steps.version>
-        <workflow-cps.version>2.11</workflow-cps.version>
+        <workflow-cps.version>2.65</workflow-cps.version>
     </properties>
 
     <dependencies>
