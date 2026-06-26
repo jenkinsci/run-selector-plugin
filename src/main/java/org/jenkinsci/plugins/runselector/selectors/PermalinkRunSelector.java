@@ -38,8 +38,8 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Picks up a build through {@link Permalink}.
@@ -48,7 +48,7 @@ import javax.annotation.Nonnull;
  */
 public class PermalinkRunSelector extends AbstractSpecificRunSelector {
 
-    @Nonnull
+    @NonNull
     private final String id;
 
     @DataBoundConstructor
@@ -56,14 +56,14 @@ public class PermalinkRunSelector extends AbstractSpecificRunSelector {
         this.id = Util.fixNull(id).trim();
     }
 
-    @Nonnull
+    @NonNull
     public String getId() {
         return id;
     }
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
+    public Run<?, ?> getBuild(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context) {
         String resolvedId = context.getEnvVars().expand(id);
         if (resolvedId.startsWith("$")) {
             context.logDebug("Unresolved variable {0}", resolvedId);
@@ -95,7 +95,7 @@ public class PermalinkRunSelector extends AbstractSpecificRunSelector {
 
         public ComboBoxModel doFillIdItems(@AncestorInPath Job<?, ?> copyingJob, @RelativePath("..") @QueryParameter("projectName") String projectName) {
             Job<?, ?> j = null;
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
             if (projectName != null && jenkins != null) {
                 j = jenkins.getItem(projectName, copyingJob, Job.class);
             }

@@ -24,10 +24,6 @@
 
 package org.jenkinsci.plugins.runselector.selectors;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -44,11 +40,12 @@ import org.jenkinsci.plugins.runselector.filters.AndRunFilter;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Tries multiple selectors consequently.
@@ -58,10 +55,10 @@ public class FallbackRunSelector extends RunSelector {
      * An entry for {@link FallbackRunSelector}
      */
     public static class Entry extends AbstractDescribableImpl<Entry>{
-        @Nonnull
+        @NonNull
         private final RunSelector runSelector;
         
-        @Nonnull
+        @NonNull
         private final RunFilter runFilter;
         
         /**
@@ -69,7 +66,7 @@ public class FallbackRunSelector extends RunSelector {
          * @param runFilter   run filter used with the run selector
          */
         @DataBoundConstructor
-        public Entry(@Nonnull RunSelector runSelector, @Nonnull RunFilter runFilter) {
+        public Entry(@NonNull RunSelector runSelector, @NonNull RunFilter runFilter) {
             this.runSelector = runSelector;
             this.runFilter = runFilter;
         }
@@ -77,7 +74,7 @@ public class FallbackRunSelector extends RunSelector {
         /**
          * @param runSelector run selector
          */
-        public Entry(@Nonnull RunSelector runSelector) {
+        public Entry(@NonNull RunSelector runSelector) {
             this(runSelector, new NoRunFilter());
         }
         
@@ -111,18 +108,12 @@ public class FallbackRunSelector extends RunSelector {
             /**
              * @return descriptors of all {@link RunSelector} except {@link FallbackRunSelector}
              */
-            public Iterable<? extends Descriptor<? extends RunSelector>> getRunSelectorDescriptorList() {
-                Jenkins jenkins = Jenkins.getInstance();
+            public List<? extends Descriptor<? extends RunSelector>> getRunSelectorDescriptorList() {
+                Jenkins jenkins = Jenkins.get();
                 // remove FallbackRunSelector itself.
-                return Iterables.filter(
-                        jenkins.getDescriptorList(RunSelector.class),
-                        new Predicate<Descriptor<? extends RunSelector>>() {
-                            @Override
-                            public boolean apply(Descriptor<? extends RunSelector> d) {
-                                return !FallbackRunSelector.class.isAssignableFrom(d.clazz);
-                            }
-                        }
-                );
+                return jenkins.getDescriptorList(RunSelector.class).stream()
+                        .filter(d -> !FallbackRunSelector.class.isAssignableFrom(d.clazz))
+                        .collect(Collectors.toList());
             }
             
             /**
@@ -135,14 +126,14 @@ public class FallbackRunSelector extends RunSelector {
         
     }
     
-    @Nonnull
+    @NonNull
     private final List<Entry> entryList;
     
     /**
      * @param entryList run selector to try
      */
     @DataBoundConstructor
-    public FallbackRunSelector(@Nonnull List<Entry> entryList) {
+    public FallbackRunSelector(@NonNull List<Entry> entryList) {
         this.entryList = entryList;
     }
 
@@ -151,16 +142,10 @@ public class FallbackRunSelector extends RunSelector {
      * 
      * @param runSelectors run selector to try
      */
-    public FallbackRunSelector(@Nonnull RunSelector... runSelectors) {
-        this(Lists.transform(
-                Arrays.asList(runSelectors),
-                new Function<RunSelector, Entry>() {
-                    @Override
-                    public Entry apply(RunSelector runSelector) {
-                        return new Entry(runSelector);
-                    }
-                }
-        ));
+    public FallbackRunSelector(@NonNull RunSelector... runSelectors) {
+        this(Arrays.stream(runSelectors)
+                .map(Entry::new)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -175,7 +160,7 @@ public class FallbackRunSelector extends RunSelector {
      */
     @Override
     @CheckForNull
-    public Run<?, ?> select(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
+    public Run<?, ?> select(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         for (Entry entry : getEntryList()) {

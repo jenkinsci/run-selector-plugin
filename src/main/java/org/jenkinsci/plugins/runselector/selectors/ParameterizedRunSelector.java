@@ -26,15 +26,15 @@ package org.jenkinsci.plugins.runselector.selectors;
 import hudson.Extension;
 import hudson.model.Job;
 import hudson.model.Run;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 /**
@@ -55,7 +55,7 @@ public class ParameterizedRunSelector extends RunSelector {
     }
 
     @CheckForNull
-    private RunSelector getSelector(@Nonnull RunSelectorContext context) {
+    private RunSelector getSelector(@NonNull RunSelectorContext context) {
         String xml = resolveParameter(context);
         if (xml == null) {
             return null;
@@ -70,7 +70,7 @@ public class ParameterizedRunSelector extends RunSelector {
 
     @Override
     @CheckForNull
-    public Run<?, ?> select(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
+    public Run<?, ?> select(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         RunSelector selector = getSelector(context);
@@ -94,7 +94,7 @@ public class ParameterizedRunSelector extends RunSelector {
      * @return xstream expression
      */
     @CheckForNull
-    private String resolveParameter(@Nonnull RunSelectorContext context) {
+    private String resolveParameter(@NonNull RunSelectorContext context) {
         if (StringUtils.isBlank(getParameterName())) {
             context.logInfo("Parameter name is not specified");
             return null;

@@ -45,10 +45,7 @@ public class SelectRunExecution extends AbstractSynchronousStepExecution<RunWrap
             throw new AbortException(Messages.SelectRunStep_MissingJobParameter());
         }
 
-        Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
+        Jenkins jenkins = Jenkins.get();
         Job<?, ?> upstreamJob = jenkins.getItem(jobName, run.getParent(), Job.class);
         if (upstreamJob == null) {
             throw new AbortException(Messages.SelectRunStep_MissingJob(jobName));

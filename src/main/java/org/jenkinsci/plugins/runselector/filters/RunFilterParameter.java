@@ -24,8 +24,6 @@
 
 package org.jenkinsci.plugins.runselector.filters;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.model.ParameterValue;
@@ -37,15 +35,17 @@ import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Build parameter used with {@link ParameterizedRunFilter}
  */
 public class RunFilterParameter extends SimpleParameterDefinition {
     @SuppressFBWarnings(value="SE_BAD_FIELD", justification="Serialized with XStream and doesn't require Serializable")
-    @Nonnull
+    @NonNull
     private final RunFilter defaultFilter;
     
     /**
@@ -107,16 +107,10 @@ public class RunFilterParameter extends SimpleParameterDefinition {
         /**
          * @return descriptors of all {@link RunFilter}s except {@link RunFilterParameter}
          */
-        public Iterable<RunFilterDescriptor> getRunFilterDescriptors() {
-            return Iterables.filter(
-                    RunFilter.allWithNoRunFilter(),
-                    new Predicate<RunFilterDescriptor>() {
-                        @Override
-                        public boolean apply(RunFilterDescriptor d) {
-                            return !d.clazz.equals(ParameterizedRunFilter.class);
-                        }
-                    }
-            );
+        public List<RunFilterDescriptor> getRunFilterDescriptors() {
+            return RunFilter.allWithNoRunFilter().stream()
+                    .filter(d -> !d.clazz.equals(ParameterizedRunFilter.class))
+                    .collect(Collectors.toList());
         }
     }
 }

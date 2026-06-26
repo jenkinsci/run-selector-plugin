@@ -30,15 +30,15 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.Run;
 import hudson.util.XStream2;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.logging.Logger;
 
 /**
@@ -48,7 +48,7 @@ public class ParameterizedRunFilter extends RunFilter {
     private static final Logger LOGGER = Logger.getLogger(ParameterizedRunFilter.class.getName());
     private static final XStream2 XSTREAM = new XStream2();
 
-    @Nonnull
+    @NonNull
     private final String parameter;
     
     /**
@@ -62,7 +62,7 @@ public class ParameterizedRunFilter extends RunFilter {
     /**
      * @return XML expression of the filters, usually including variable expression.
      */
-    @Nonnull
+    @NonNull
     public String getParameter() {
         return parameter;
     }

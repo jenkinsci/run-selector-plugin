@@ -23,9 +23,6 @@
  */
 package org.jenkinsci.plugins.runselector.selectors;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStreamException;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
@@ -44,6 +41,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author Alan Harder
@@ -102,7 +100,7 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
         }
 
         public DescriptorExtensionList<RunSelector,Descriptor<RunSelector>> getRunSelectors() {
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
             return jenkins.getDescriptorList(RunSelector.class);
         }
 
@@ -110,15 +108,10 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
          * @return {@link RunSelector}s available for RunSelectorParameter.
          */
         public List<Descriptor<RunSelector>> getAvailableRunSelectorList() {
-            Jenkins jenkins = Jenkins.getInstance();
-            return Lists.newArrayList(Collections2.filter(
-                    jenkins.getDescriptorList(RunSelector.class),
-                    new Predicate<Descriptor<RunSelector>>() {
-                        public boolean apply(Descriptor<RunSelector> input) {
-                            return !"ParameterizedRunSelector".equals(input.clazz.getSimpleName());
-                        };
-                    }
-            ));
+            Jenkins jenkins = Jenkins.get();
+            return jenkins.getDescriptorList(RunSelector.class).stream()
+                    .filter(d -> !"ParameterizedRunSelector".equals(d.clazz.getSimpleName()))
+                    .collect(Collectors.toList());
         }
     }
 
@@ -126,7 +119,7 @@ public class RunSelectorParameter extends SimpleParameterDefinition {
 
     @Initializer(after = InitMilestone.PLUGINS_STARTED)
     public static void initAliases() {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
         // Alias all RunSelectors to their simple names
         for (Descriptor<RunSelector> d : jenkins.getDescriptorByType(DescriptorImpl.class).getRunSelectors())
             XSTREAM.alias(d.clazz.getSimpleName(), d.clazz);

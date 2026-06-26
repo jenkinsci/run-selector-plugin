@@ -10,8 +10,8 @@ import org.jenkinsci.plugins.runselector.RunSelectorDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 
@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 public class BuildNumberRunSelector extends AbstractSpecificRunSelector {
 
-    @Nonnull
+    @NonNull
     private final String buildNumber;
 
     @DataBoundConstructor
@@ -30,14 +30,14 @@ public class BuildNumberRunSelector extends AbstractSpecificRunSelector {
         this.buildNumber = Util.fixNull(buildNumber).trim();
     }
 
-    @Nonnull
+    @NonNull
     public String getBuildNumber() {
         return buildNumber;
     }
 
     @Override
     @CheckForNull
-    public Run<?, ?> getBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) throws IOException {
+    public Run<?, ?> getBuild(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context) throws IOException {
         String resolvedBuildNumber = context.getEnvVars().expand(buildNumber);
         if (resolvedBuildNumber.startsWith("$")) {
             context.logDebug("Unresolved variable {0}", resolvedBuildNumber);
