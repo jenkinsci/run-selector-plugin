@@ -34,8 +34,8 @@ import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Select build based on the specific status build.
@@ -85,7 +85,7 @@ public class StatusRunSelector extends RunSelector {
         }
     }
 
-    @Nonnull
+    @NonNull
     private final BuildStatus buildStatus;
 
     public StatusRunSelector() {
@@ -103,7 +103,7 @@ public class StatusRunSelector extends RunSelector {
     /**
      * @return build status to select
      */
-    @Nonnull
+    @NonNull
     public BuildStatus getBuildStatus() {
         return buildStatus;
     }
@@ -113,7 +113,7 @@ public class StatusRunSelector extends RunSelector {
      */
     @Override
     @CheckForNull
-    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
+    public Run<?, ?> getNextBuild(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context) {
         Run<?, ?> previousBuild = context.getLastMatchBuild();
         if (previousBuild == null) {
             // the first time

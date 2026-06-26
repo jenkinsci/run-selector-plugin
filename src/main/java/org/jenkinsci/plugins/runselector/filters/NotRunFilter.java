@@ -32,27 +32,27 @@ import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Accepts a build when the underlying filters doesn't accept it.
  */
 public class NotRunFilter extends RunFilter {
-    @Nonnull
+    @NonNull
     private final RunFilter runFilter;
     
     /**
      * @param runFilter run filter to invert
      */
     @DataBoundConstructor
-    public NotRunFilter(@Nonnull RunFilter runFilter) {
+    public NotRunFilter(@NonNull RunFilter runFilter) {
         this.runFilter = runFilter;
     }
     
     /**
      * @return run filter to invert
      */
-    @Nonnull
+    @NonNull
     public RunFilter getRunFilter() {
         return runFilter;
     }

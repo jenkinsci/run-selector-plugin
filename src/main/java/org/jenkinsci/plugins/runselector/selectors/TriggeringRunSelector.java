@@ -40,8 +40,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -181,7 +181,7 @@ public class TriggeringRunSelector extends RunSelector {
      */
     @Override
     @CheckForNull
-    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context) {
+    public Run<?, ?> getNextBuild(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context) {
         ContextExtension ext = context.getExtension(ContextExtension.class);
         if (ext == null) {
             // first time to be called.
@@ -214,8 +214,8 @@ public class TriggeringRunSelector extends RunSelector {
         return ext.nextBuild.next();
     }
     
-    @Nonnull
-    private HashSet<Run<?, ?>> getAllUpstreamBuilds(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context, @Nonnull Run<?, ?> parent) {
+    @NonNull
+    private HashSet<Run<?, ?>> getAllUpstreamBuilds(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context, @NonNull Run<?, ?> parent) {
         HashSet<Run<?, ?>> result = new HashSet<Run<?, ?>>();
         
         // Upstream job for matrix will be parent project, not only individual configuration:

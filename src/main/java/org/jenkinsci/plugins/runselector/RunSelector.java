@@ -29,8 +29,8 @@ import hudson.model.Job;
 import hudson.model.Run;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 /**
@@ -49,7 +49,7 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
      * @throws InterruptedException if any thread interrupts the current thread.
      */
     @CheckForNull
-    public Run<?, ?> select(@Nonnull Job<?,?> job, @Nonnull final RunSelectorContext context)
+    public Run<?, ?> select(@NonNull Job<?,?> job, @NonNull final RunSelectorContext context)
             throws IOException, InterruptedException
     {
         context.setLastMatchBuild(null);
@@ -89,7 +89,7 @@ public abstract class RunSelector extends AbstractDescribableImpl<RunSelector> i
      * @throws InterruptedException if any thread interrupts the current thread.
      */
     @CheckForNull
-    public Run<?, ?> getNextBuild(@Nonnull Job<?, ?> job, @Nonnull RunSelectorContext context)
+    public Run<?, ?> getNextBuild(@NonNull Job<?, ?> job, @NonNull RunSelectorContext context)
             throws IOException, InterruptedException
     {
         // Though this can be protected,

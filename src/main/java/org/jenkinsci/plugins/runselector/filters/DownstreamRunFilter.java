@@ -34,7 +34,7 @@ import hudson.model.Job;
 import hudson.model.Run;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
@@ -42,16 +42,16 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Select a build which is a downstream of a specified build.
  */
 public class DownstreamRunFilter extends RunFilter {
-    @Nonnull
+    @NonNull
     private final String upstreamProjectName;
-    @Nonnull
+    @NonNull
     private final String upstreamBuildNumber;
     
     /**
@@ -68,7 +68,7 @@ public class DownstreamRunFilter extends RunFilter {
     /**
      * @return upstream project name. May include variable expression.
      */
-    @Nonnull
+    @NonNull
     public String getUpstreamProjectName() {
         return upstreamProjectName;
     }
@@ -76,7 +76,7 @@ public class DownstreamRunFilter extends RunFilter {
     /**
      * @return upstream build number. May include variable expression.
      */
-    @Nonnull
+    @NonNull
     public String getUpstreamBuildNumber() {
         return upstreamBuildNumber;
     }
@@ -85,7 +85,7 @@ public class DownstreamRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(@Nonnull Run<?, ?> run, @Nonnull RunSelectorContext context) {
+    public boolean isSelectable(@NonNull Run<?, ?> run, @NonNull RunSelectorContext context) {
         if (!(run instanceof AbstractBuild<?,?>)) {
             // As this feature depends on `AbstractBuild#getUpstreamRelationshipBuild(AbstractProject<?,?>)`
             context.logInfo(
@@ -211,7 +211,7 @@ public class DownstreamRunFilter extends RunFilter {
                 return FormValidation.ok();
             }
             
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
 
             if (project == null) {
                 // Context is unknown and validation is useless.
@@ -272,7 +272,7 @@ public class DownstreamRunFilter extends RunFilter {
                 return FormValidation.ok();
             }
             
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
 
             if (project == null) {
                 // Context is unknown and validation is useless.

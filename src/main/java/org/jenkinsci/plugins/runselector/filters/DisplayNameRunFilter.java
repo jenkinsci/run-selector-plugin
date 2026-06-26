@@ -9,7 +9,7 @@ import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Filters the build based on its display name.
@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
  */
 public class DisplayNameRunFilter extends RunFilter {
 
-    @Nonnull
+    @NonNull
     private String runDisplayName;
 
     @DataBoundConstructor
@@ -26,13 +26,13 @@ public class DisplayNameRunFilter extends RunFilter {
         this.runDisplayName = Util.fixNull(runDisplayName).trim();
     }
 
-    @Nonnull
+    @NonNull
     public String getRunDisplayName() {
         return runDisplayName;
     }
 
     @Override
-    public boolean isSelectable(@Nonnull Run<?, ?> candidate, @Nonnull RunSelectorContext context) {
+    public boolean isSelectable(@NonNull Run<?, ?> candidate, @NonNull RunSelectorContext context) {
         String resolvedDisplayName = context.getEnvVars().expand(runDisplayName);
         if (resolvedDisplayName.startsWith("$")) {
             context.logDebug("Unresolved variable {0}", resolvedDisplayName);

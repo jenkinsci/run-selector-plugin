@@ -35,8 +35,8 @@ import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
@@ -57,17 +57,17 @@ public class RunSelectorContext implements Cloneable {
 
     private static final Logger LOGGER = Logger.getLogger(RunSelectorContext.class.getName());
 
-    @Nonnull
+    @NonNull
     private final Jenkins jenkins;
-    @Nonnull
+    @NonNull
     private final Run<?, ?> build;
-    @Nonnull
+    @NonNull
     private final TaskListener listener;
-    @Nonnull
+    @NonNull
     private EnvVars envVars;
-    @Nonnull
+    @NonNull
     private RunFilter runFilter;
-    @Nonnull
+    @NonNull
     private List<Object> extensionList;
     @CheckForNull
     private Run<?, ?> lastMatchBuild;
@@ -81,7 +81,7 @@ public class RunSelectorContext implements Cloneable {
      * @param build    the build running runselector
      * @param listener listener for the build running runselector
      */
-    public RunSelectorContext(@Nonnull Jenkins jenkins, @Nonnull Run<?, ?> build, @Nonnull TaskListener listener)
+    public RunSelectorContext(@NonNull Jenkins jenkins, @NonNull Run<?, ?> build, @NonNull TaskListener listener)
             throws IOException, InterruptedException {
 
         this(jenkins, build, listener, new NoRunFilter());
@@ -94,8 +94,8 @@ public class RunSelectorContext implements Cloneable {
      * @param build    the build running runselector
      * @param listener listener for the build running runselector
      */
-    public RunSelectorContext(@Nonnull Jenkins jenkins, @Nonnull Run<?, ?> build, @Nonnull TaskListener listener,
-                              @Nonnull RunFilter runFilter)
+    public RunSelectorContext(@NonNull Jenkins jenkins, @NonNull Run<?, ?> build, @NonNull TaskListener listener,
+                              @NonNull RunFilter runFilter)
             throws IOException, InterruptedException {
 
         this.jenkins = jenkins;
@@ -110,7 +110,7 @@ public class RunSelectorContext implements Cloneable {
     /**
      * @return the Jenkins instance
      */
-    @Nonnull
+    @NonNull
     public Jenkins getJenkins() {
         return jenkins;
     }
@@ -118,7 +118,7 @@ public class RunSelectorContext implements Cloneable {
     /**
      * @return the build running runselector
      */
-    @Nonnull
+    @NonNull
     public Run<?, ?> getBuild() {
         return build;
     }
@@ -126,7 +126,7 @@ public class RunSelectorContext implements Cloneable {
     /**
      * @return the listener for the build running runselector
      */
-    @Nonnull
+    @NonNull
     public TaskListener getListener() {
         return listener;
     }
@@ -134,7 +134,7 @@ public class RunSelectorContext implements Cloneable {
     /**
      * @return environment variables for the current build
      */
-    @Nonnull
+    @NonNull
     public EnvVars getEnvVars() {
         return envVars;
     }
@@ -144,7 +144,7 @@ public class RunSelectorContext implements Cloneable {
      *
      * @return stream to output logs
      */
-    @Nonnull
+    @NonNull
     public PrintStream getConsole() {
         return listener.getLogger();
     }
@@ -166,14 +166,14 @@ public class RunSelectorContext implements Cloneable {
     /**
      * @param runFilter the filter for builds
      */
-    public void setRunFilter(@Nonnull RunFilter runFilter) {
+    public void setRunFilter(@NonNull RunFilter runFilter) {
         this.runFilter = runFilter;
     }
 
     /**
      * @return a filter for builds
      */
-    @Nonnull
+    @NonNull
     public RunFilter getRunFilter() {
         return runFilter;
     }
@@ -199,7 +199,7 @@ public class RunSelectorContext implements Cloneable {
     /**
      * @return additional information by plugins
      */
-    @Nonnull
+    @NonNull
     public List<Object> getExtensionList() {
         return extensionList;
     }
@@ -209,7 +209,7 @@ public class RunSelectorContext implements Cloneable {
      *
      * @param extension extension object
      */
-    public void addExtension(@Nonnull Object extension) {
+    public void addExtension(@NonNull Object extension) {
         getExtensionList().add(extension);
     }
 
@@ -217,7 +217,7 @@ public class RunSelectorContext implements Cloneable {
      * @param extension extension object to remove
      * @return true if the extension is contained
      */
-    public boolean removeExtension(@Nonnull Object extension) {
+    public boolean removeExtension(@NonNull Object extension) {
         return getExtensionList().remove(extension);
     }
 
@@ -227,7 +227,7 @@ public class RunSelectorContext implements Cloneable {
      * @param extension extension object to replace with
      * @return true if an extension object of the same class class is contained
      */
-    public boolean replaceExtension(@Nonnull Object extension) {
+    public boolean replaceExtension(@NonNull Object extension) {
         boolean removed = false;
         while (true) {
             Object e = getExtension(extension.getClass());
@@ -249,18 +249,18 @@ public class RunSelectorContext implements Cloneable {
      * @return extension of the class
      */
     @CheckForNull
-    public <T> T getExtension(@Nonnull Class<T> clazz) {
+    public <T> T getExtension(@NonNull Class<T> clazz) {
         for (Object e : getExtensionList())
             if (clazz.isInstance(e))
                 return clazz.cast(e);
         return null;
     }
 
-    private void log(@Nonnull String message) {
+    private void log(@NonNull String message) {
         getConsole().println(message);
     }
 
-    private void log(@Nonnull String message, @Nonnull Throwable t) {
+    private void log(@NonNull String message, @NonNull Throwable t) {
         getConsole().println(message);
         t.printStackTrace(getConsole());
     }
@@ -270,7 +270,7 @@ public class RunSelectorContext implements Cloneable {
      *
      * @param message message to log
      */
-    public void logInfo(@Nonnull String message) {
+    public void logInfo(@NonNull String message) {
         log(message);
     }
 
@@ -280,7 +280,7 @@ public class RunSelectorContext implements Cloneable {
      * @param pattern   pattern for {@link MessageFormat}
      * @param arguments values to format
      */
-    public void logInfo(@Nonnull String pattern, Object... arguments) {
+    public void logInfo(@NonNull String pattern, Object... arguments) {
         log(MessageFormat.format(pattern, arguments));
     }
 
@@ -289,7 +289,7 @@ public class RunSelectorContext implements Cloneable {
      *
      * @param message message to log
      */
-    public void logDebug(@Nonnull String message) {
+    public void logDebug(@NonNull String message) {
         if (isVerbose()) {
             log(message);
         }
@@ -302,7 +302,7 @@ public class RunSelectorContext implements Cloneable {
      * @param pattern   pattern for {@link MessageFormat}
      * @param arguments values to format
      */
-    public void logDebug(@Nonnull String pattern, Object... arguments) {
+    public void logDebug(@NonNull String pattern, Object... arguments) {
         if (isVerbose()) {
             log(MessageFormat.format(pattern, arguments));
         }
@@ -314,7 +314,7 @@ public class RunSelectorContext implements Cloneable {
      * @param string message to log
      * @param t      exception to log
      */
-    public void logException(@Nonnull String string, @Nonnull Throwable t) {
+    public void logException(@NonNull String string, @NonNull Throwable t) {
         log(string, t);
     }
 

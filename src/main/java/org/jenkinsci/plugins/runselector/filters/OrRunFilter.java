@@ -32,7 +32,7 @@ import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,14 +40,14 @@ import java.util.List;
  * Accepts a build when any of underlying filters accepts it.
  */
 public class OrRunFilter extends RunFilter {
-    @Nonnull
+    @NonNull
     private final List<RunFilter> runFilterList;
     
     /**
      * @param runFilterList run filter to disjunct
      */
     @DataBoundConstructor
-    public OrRunFilter(@Nonnull List<RunFilter> runFilterList) {
+    public OrRunFilter(@NonNull List<RunFilter> runFilterList) {
         this.runFilterList = runFilterList;
     }
     
@@ -56,14 +56,14 @@ public class OrRunFilter extends RunFilter {
      * 
      * @param runFilters run filter to disjunct
      */
-    public OrRunFilter(@Nonnull RunFilter... runFilters) {
+    public OrRunFilter(@NonNull RunFilter... runFilters) {
         this(Arrays.asList(runFilters));
     }
     
     /**
      * @return run filter to disjunct
      */
-    @Nonnull
+    @NonNull
     public List<RunFilter> getRunFilterList() {
         return runFilterList;
     }

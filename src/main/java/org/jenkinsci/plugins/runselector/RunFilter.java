@@ -23,8 +23,6 @@
  */
 package org.jenkinsci.plugins.runselector;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -33,9 +31,10 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.filters.NoRunFilter;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Additional filters used by {@link RunSelector}.
@@ -49,7 +48,7 @@ public abstract class RunFilter extends AbstractDescribableImpl<RunFilter> imple
      * @param context the context of current runselector execution.
      * @return whether this build can be selected.
      */
-    public boolean isSelectable(@Nonnull Run<?, ?> candidate, @Nonnull RunSelectorContext context) {
+    public boolean isSelectable(@NonNull Run<?, ?> candidate, @NonNull RunSelectorContext context) {
         return true;
     }
     
@@ -65,16 +64,10 @@ public abstract class RunFilter extends AbstractDescribableImpl<RunFilter> imple
      * @return all descriptors of {@link RunFilter} without {@link NoRunFilter}
      */
     public static List<RunFilterDescriptor> all() {
-        Jenkins j = Jenkins.getInstance();
-        return Lists.transform(
-                j.getDescriptorList(RunFilter.class),
-                new Function<Descriptor<?>, RunFilterDescriptor>() {
-                    @Override
-                    public RunFilterDescriptor apply(Descriptor<?> arg0) {
-                        return (RunFilterDescriptor)arg0;
-                    }
-                }
-        );
+        Jenkins j = Jenkins.get();
+        return j.getDescriptorList(RunFilter.class).stream()
+                .map(d -> (RunFilterDescriptor) d)
+                .collect(Collectors.toList());
     }
     
     /**

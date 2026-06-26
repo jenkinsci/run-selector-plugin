@@ -37,7 +37,7 @@ import org.jenkinsci.plugins.runselector.RunFilterDescriptor;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -67,7 +67,7 @@ public class ParametersRunFilter extends RunFilter {
         return paramsToMatch;
     }
 
-    private List<StringParameterValue> getFilterParameters(@Nonnull RunSelectorContext context) {
+    private List<StringParameterValue> getFilterParameters(@NonNull RunSelectorContext context) {
         // Initialize.. parse out the given parameters/values.
         List<StringParameterValue> filters = new ArrayList<StringParameterValue>(5);
         Matcher m = PARAMVAL_PATTERN.matcher(context.getEnvVars().expand(getParamsToMatch()));
@@ -80,7 +80,7 @@ public class ParametersRunFilter extends RunFilter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSelectable(@Nonnull Run<?,?> run, @Nonnull RunSelectorContext context) {
+    public boolean isSelectable(@NonNull Run<?,?> run, @NonNull RunSelectorContext context) {
         EnvVars otherEnv;
         try {
             otherEnv = run.getEnvironment(TaskListener.NULL);
@@ -105,7 +105,7 @@ public class ParametersRunFilter extends RunFilter {
         }
         List<StringParameterValue> filters = getFilterParameters(context);
         for (StringParameterValue spv : filters) {
-            if (!spv.value.equals(otherEnv.get(spv.getName()))) {
+            if (!spv.getValue().equals(otherEnv.get(spv.getName()))) {
                 context.logDebug(
                         "{0}: {1} is declined",
                         getDisplayName(),
