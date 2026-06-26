@@ -3,7 +3,7 @@ package org.jenkinsci.plugins.runselector.steps;
 import hudson.model.Result;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.util.VersionNumber;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -15,8 +15,8 @@ import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.localizer.LocaleProvider;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Locale;
 
 import static java.lang.String.format;
@@ -107,8 +107,6 @@ public class SelectRunStepTest {
 
     @Test
     public void testStatusSymbol() throws Exception {
-        assumeSymbolDependencies();
-
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -123,8 +121,6 @@ public class SelectRunStepTest {
 
     @Test
     public void testSpecificRunSymbol() throws Exception {
-        assumeSymbolDependencies();
-
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -139,8 +135,6 @@ public class SelectRunStepTest {
 
     @Test
     public void testPermalinkSymbol() throws Exception {
-        assumeSymbolDependencies();
-
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -154,30 +148,12 @@ public class SelectRunStepTest {
     }
 
     /**
-     * To use the @Symbol annotation in tests, minimum workflow-cps version 2.10 is required.
-     * This dependency comes with other dependency version requirements, as stated by this method.
-     * To run tests restricted by this method, type
-     * <pre>
-     *  mvn clean install -Djenkins.version=1.642.1 -Djava.level=7 -Dworkflow-step-api.version=2.3 -Dworkflow-support.version=2.2 -Dworkflow-job.version=2.4 -Dworkflow-basic-steps.version=2.1 -Dworkflow-cps.version=2.10
-     * </pre>
-     */
-    private static void assumeSymbolDependencies() {
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("jenkins.version"), "1.642.1");
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("java.level"), "7");
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-step-api.version"), "2.3");
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-support.version"), "2.2");
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-job.version"), "2.4");
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-basic-steps.version"), "2.1");
-        assumePropertyIsGreaterThanOrEqualTo(System.getProperty("workflow-cps.version"), "2.10");
-    }
-
-    /**
      * Checks if the given property is not null, and if it's greater than or equal to the given version.
      *
      * @param property the property to be checked
      * @param version  the version on which the property is checked against
      */
-    private static void assumePropertyIsGreaterThanOrEqualTo(@CheckForNull String property, @Nonnull String version) {
+    private static void assumePropertyIsGreaterThanOrEqualTo(@CheckForNull String property, @NonNull String version) {
         assumeThat(property, notNullValue());
         assumeThat(new VersionNumber(property).compareTo(new VersionNumber(version)), is(greaterThanOrEqualTo(0)));
     }
