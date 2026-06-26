@@ -136,7 +136,7 @@ public class CopyArtifactWorkflowTest {
         Assert.assertEquals("hello.txt", artifacts.get(0).relativePath);
     }
 
-    private WorkflowJob createWorkflow(String name, String script) throws IOException {
+    private WorkflowJob createWorkflow(String name, String script) throws IOException, hudson.model.Descriptor.FormException {
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, name);
         job.setDefinition(new CpsFlowDefinition("node {" + script + "}", true));
         return job;
