@@ -15,34 +15,45 @@ import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.selectors.StatusRunSelector;
+import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for {@link DisplayNameRunFilter}.
  *
  * @author Alexandru Somai
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DisplayNameRunFilterTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
+    private FreeStyleProject jobToSelect;
 
-    private static FreeStyleProject jobToSelect;
+    @BeforeAll
+    void setUpJenkins() throws Throwable {
+        j = JenkinsRuleHelper.createAndStart(getClass());
+    }
 
-    @BeforeClass
+    @AfterAll
+    void tearDownJenkins() throws Throwable {
+        j.after();
+    }
+
+    @BeforeAll
     @SuppressWarnings("Duplicates")
-    public static void setUp() throws Exception {
+    void setUp() throws Exception {
         jobToSelect = j.createFreeStyleProject();
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
@@ -53,7 +64,7 @@ public class DisplayNameRunFilterTest {
     }
 
     @Test
-    public void testDisplayName() throws Exception {
+    void testDisplayName() throws Exception {
         jobToSelect.getBuildByNumber(2).setDisplayName("RC1");
 
         FreeStyleProject selecter = j.createFreeStyleProject();
@@ -87,7 +98,7 @@ public class DisplayNameRunFilterTest {
     }
 
     @Test
-    public void testDisplayNameWorkflow() throws Exception {
+    void testDisplayNameWorkflow() throws Exception {
         jobToSelect.getBuildByNumber(2).setDisplayName("RC1");
 
         WorkflowRun run = createWorkflowJobAndRun(String.format("" +
@@ -100,7 +111,7 @@ public class DisplayNameRunFilterTest {
     }
 
     @Test
-    public void testDisplayNameWorkflowWrongValue() throws Exception {
+    void testDisplayNameWorkflowWrongValue() throws Exception {
         WorkflowRun run = createWorkflowJobAndRun(String.format("" +
                 "def runWrapper = selectRun job: '%s', " +
                 " filter: [$class: 'DisplayNameRunFilter', runDisplayName: 'does-not-exist'], " +
@@ -110,7 +121,7 @@ public class DisplayNameRunFilterTest {
         j.assertLogContains(String.format("Unable to find Run for: %s", jobToSelect.getFullName()), run);
     }
 
-    private static WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
+    private WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
         WorkflowJob job = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
         job.setDefinition(new CpsFlowDefinition(script));
         return job.scheduleBuild2(0).get();

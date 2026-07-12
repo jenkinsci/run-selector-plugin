@@ -13,36 +13,47 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
+import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests for {@link PermalinkRunSelector}.
  *
  * @author Alexandru Somai
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PermalinkRunSelectorTest  {
 
-    @ClassRule
-    public static final JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
+    private WorkflowJob jobToSelect;
+    private WorkflowRun successRun;
+    private WorkflowRun unstableRun;
+    private WorkflowRun failureRun;
+    private WorkflowRun abortedRun;
 
-    private static WorkflowJob jobToSelect;
-    private static WorkflowRun successRun;
-    private static WorkflowRun unstableRun;
-    private static WorkflowRun failureRun;
-    private static WorkflowRun abortedRun;
+    @BeforeAll
+    void setUpJenkins() throws Throwable {
+        j = JenkinsRuleHelper.createAndStart(getClass());
+    }
 
-    @BeforeClass
+    @AfterAll
+    void tearDownJenkins() throws Throwable {
+        j.after();
+    }
+
+    @BeforeAll
     @SuppressWarnings("Duplicates")
-    public static void setUp() throws Exception {
+    void setUp() throws Exception {
         jobToSelect = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
 
         jobToSelect.setDefinition(new CpsFlowDefinition("currentBuild.result = 'SUCCESS'"));
@@ -59,43 +70,43 @@ public class PermalinkRunSelectorTest  {
     }
 
     @Test
-    public void testLastBuild() throws Exception {
+    void testLastBuild() throws Exception {
         RunSelector selector = new PermalinkRunSelector(PermalinkProjectAction.Permalink.LAST_BUILD.getId());
         verifySelectedRun(selector, abortedRun);
     }
 
     @Test
-    public void testLastFailedBuild() throws Exception {
+    void testLastFailedBuild() throws Exception {
         RunSelector selector = new PermalinkRunSelector(PermalinkProjectAction.Permalink.LAST_FAILED_BUILD.getId());
         verifySelectedRun(selector, failureRun);
     }
 
     @Test
-    public void testLastStableBuild() throws Exception {
+    void testLastStableBuild() throws Exception {
         RunSelector selector = new PermalinkRunSelector(PermalinkProjectAction.Permalink.LAST_STABLE_BUILD.getId());
         verifySelectedRun(selector, successRun);
     }
 
     @Test
-    public void testLastSuccessfulBuild() throws Exception {
+    void testLastSuccessfulBuild() throws Exception {
         RunSelector selector = new PermalinkRunSelector(PermalinkProjectAction.Permalink.LAST_SUCCESSFUL_BUILD.getId());
         verifySelectedRun(selector, unstableRun);
     }
 
     @Test
-    public void testLastUnstableBuild() throws Exception {
+    void testLastUnstableBuild() throws Exception {
         RunSelector selector = new PermalinkRunSelector(PermalinkProjectAction.Permalink.LAST_UNSTABLE_BUILD.getId());
         verifySelectedRun(selector, unstableRun);
     }
 
     @Test
-    public void testLastCompletedBuild() throws Exception {
+    void testLastCompletedBuild() throws Exception {
         RunSelector selector = new PermalinkRunSelector(PermalinkProjectAction.Permalink.LAST_UNSUCCESSFUL_BUILD.getId());
         verifySelectedRun(selector, abortedRun);
     }
 
     @Test
-    public void testWorkflow() throws Exception {
+    void testWorkflow() throws Exception {
         WorkflowJob job = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
         job.setDefinition(new CpsFlowDefinition(String.format("" +
                         "def runWrapper = selectRun job: '%s', " +
@@ -107,7 +118,7 @@ public class PermalinkRunSelectorTest  {
     }
 
     @Test
-    public void testPermalinkSelectorParameter() throws Exception {
+    void testPermalinkSelectorParameter() throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
         selecter.addProperty(new ParametersDefinitionProperty(
                 new StringParameterDefinition("NUM", "")
@@ -175,7 +186,7 @@ public class PermalinkRunSelectorTest  {
         assertThat(selectedRun, Matchers.<Run>is(jobToSelect.getLastUnsuccessfulBuild()));
     }
 
-    private static void verifySelectedRun(RunSelector selector, Run expectedRun) throws Exception {
+    private void verifySelectedRun(RunSelector selector, Run expectedRun) throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
 
         Run run = j.assertBuildStatusSuccess(selecter.scheduleBuild2(0));

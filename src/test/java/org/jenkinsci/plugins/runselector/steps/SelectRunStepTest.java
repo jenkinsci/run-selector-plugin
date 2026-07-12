@@ -4,15 +4,19 @@ import hudson.model.Result;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.util.VersionNumber;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.jvnet.hudson.test.BuildWatcher;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.BuildWatcherExtension;
 import org.jvnet.localizer.LocaleProvider;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -20,29 +24,39 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Locale;
 
 import static java.lang.String.format;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Tests for the {@link SelectRunStep}.
  *
  * @author Alexandru Somai
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SelectRunStepTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
 
-    @ClassRule
-    public static BuildWatcher watcher = new BuildWatcher();
+    @RegisterExtension
+    static final BuildWatcherExtension watcher = new BuildWatcherExtension();
 
     private LocaleProvider providerToRestore;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    void setUpJenkins() throws Throwable {
+        j = JenkinsRuleHelper.createAndStart(getClass());
+    }
+
+    @AfterAll
+    void tearDownJenkins() throws Throwable {
+        j.after();
+    }
+
+    @BeforeEach
+    void setUp() {
         providerToRestore = LocaleProvider.getProvider();
 
         // expect English messages
@@ -54,13 +68,13 @@ public class SelectRunStepTest {
         });
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         LocaleProvider.setProvider(providerToRestore);
     }
 
     @Test
-    public void missingProjectName() throws Exception {
+    void missingProjectName() throws Exception {
         WorkflowRun run = createWorkflowJobAndRun("def runWrapper = selectRun '' ");
 
         j.assertBuildStatus(Result.FAILURE, run);
@@ -68,7 +82,7 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void missingProject() throws Exception {
+    void missingProject() throws Exception {
         WorkflowRun run = createWorkflowJobAndRun("def runWrapper = selectRun 'not-existent' ");
 
         j.assertBuildStatus(Result.FAILURE, run);
@@ -76,7 +90,7 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void usingDefaultSelectorAndFilter() throws Exception {
+    void usingDefaultSelectorAndFilter() throws Exception {
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -92,7 +106,7 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void upstreamHasNoLastStableBuild() throws Exception {
+    void upstreamHasNoLastStableBuild() throws Exception {
         WorkflowRun upstreamRun = createWorkflowJobAndRun("throw new Exception()");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatus(Result.FAILURE, upstreamRun);
@@ -106,7 +120,7 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void testStatusSymbol() throws Exception {
+    void testStatusSymbol() throws Exception {
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -120,7 +134,7 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void testSpecificRunSymbol() throws Exception {
+    void testSpecificRunSymbol() throws Exception {
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -134,7 +148,7 @@ public class SelectRunStepTest {
     }
 
     @Test
-    public void testPermalinkSymbol() throws Exception {
+    void testPermalinkSymbol() throws Exception {
         WorkflowRun upstreamRun = createWorkflowJobAndRun("echo 'foobar'");
         String projectName = upstreamRun.getParent().getFullName();
         j.assertBuildStatusSuccess(upstreamRun);
@@ -154,11 +168,12 @@ public class SelectRunStepTest {
      * @param version  the version on which the property is checked against
      */
     private static void assumePropertyIsGreaterThanOrEqualTo(@CheckForNull String property, @NonNull String version) {
-        assumeThat(property, notNullValue());
-        assumeThat(new VersionNumber(property).compareTo(new VersionNumber(version)), is(greaterThanOrEqualTo(0)));
+        assumeTrue(property != null, "property must not be null");
+        assumeTrue(new VersionNumber(property).compareTo(new VersionNumber(version)) >= 0,
+                "property version must be >= " + version);
     }
 
-    private static WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
+    private WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
         WorkflowJob job = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
         job.setDefinition(new CpsFlowDefinition(script));
         QueueTaskFuture<WorkflowRun> runFuture = job.scheduleBuild2(0);

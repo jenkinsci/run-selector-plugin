@@ -6,35 +6,46 @@ import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.filters.ParametersRunFilter;
+import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for {@link BuildNumberRunSelector}.
  *
  * @author Alexandru Somai
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BuildNumberRunSelectorTest {
 
-    @ClassRule
-    public static final JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
+    private FreeStyleProject jobToSelect;
 
-    private static FreeStyleProject jobToSelect;
+    @BeforeAll
+    void setUpJenkins() throws Throwable {
+        j = JenkinsRuleHelper.createAndStart(getClass());
+    }
 
-    @BeforeClass
+    @AfterAll
+    void tearDownJenkins() throws Throwable {
+        j.after();
+    }
+
+    @BeforeAll
     @SuppressWarnings("Duplicates")
-    public static void setUp() throws Exception {
+    void setUp() throws Exception {
         jobToSelect = j.createFreeStyleProject();
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
@@ -45,7 +56,7 @@ public class BuildNumberRunSelectorTest {
     }
 
     @Test
-    public void testBuildNumberSelector() throws Exception {
+    void testBuildNumberSelector() throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
         BuildNumberRunSelector selector = new BuildNumberRunSelector("1");
         assertThat(selector.getBuildNumber(), is("1"));
@@ -57,7 +68,7 @@ public class BuildNumberRunSelectorTest {
     }
 
     @Test
-    public void testBuildNumberSelectorParameter() throws Exception {
+    void testBuildNumberSelectorParameter() throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
         ParameterDefinition paramDef = new StringParameterDefinition("BAR", "1");
         selecter.addProperty(new ParametersDefinitionProperty(paramDef));
@@ -70,7 +81,7 @@ public class BuildNumberRunSelectorTest {
     }
 
     @Test
-    public void testBuildNumberSelectorWithParameterFilter() throws Exception {
+    void testBuildNumberSelectorWithParameterFilter() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         jobToSelect.addProperty(new ParametersDefinitionProperty(
                 new StringParameterDefinition("FOO", "")
@@ -100,7 +111,7 @@ public class BuildNumberRunSelectorTest {
 
     @Issue("JENKINS-14266")
     @Test
-    public void testUnsetVar() throws Exception {
+    void testUnsetVar() throws Exception {
         FreeStyleProject selecter = j.createFreeStyleProject();
         selecter.addProperty(new ParametersDefinitionProperty(
                 new StringParameterDefinition("NUM", "")
@@ -130,7 +141,7 @@ public class BuildNumberRunSelectorTest {
     }
 
     @Test
-    public void testBuildNumberWorkflow() throws Exception {
+    void testBuildNumberWorkflow() throws Exception {
         WorkflowRun run = createWorkflowJobAndRun(String.format("" +
                 "def runWrapper = selectRun job: '%s', " +
                 " selector: [$class: 'BuildNumberRunSelector', buildNumber: '1'], " +
@@ -141,7 +152,7 @@ public class BuildNumberRunSelectorTest {
     }
 
     @Test
-    public void testBuildNumberWorkflowDoesNotExist() throws Exception {
+    void testBuildNumberWorkflowDoesNotExist() throws Exception {
         WorkflowRun run = createWorkflowJobAndRun(String.format("" +
                 "def runWrapper = selectRun job: '%s', " +
                 " selector: [$class: 'BuildNumberRunSelector', buildNumber: '-1'], " +
@@ -150,7 +161,7 @@ public class BuildNumberRunSelectorTest {
         j.assertBuildStatus(Result.FAILURE, run);
     }
 
-    private static WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
+    private WorkflowRun createWorkflowJobAndRun(String script) throws Exception {
         WorkflowJob job = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
         job.setDefinition(new CpsFlowDefinition(script));
         return job.scheduleBuild2(0).get();
