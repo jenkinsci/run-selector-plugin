@@ -35,15 +35,13 @@ import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
-import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.io.IOException;
 
@@ -54,19 +52,14 @@ import static org.hamcrest.Matchers.nullValue;
 /**
  * Tests for {@link ParameterizedRunSelector}
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithJenkins
 public class ParameterizedRunSelectorTest {
 
     private JenkinsRule j;
 
-    @BeforeAll
-    void setUpJenkins() throws Throwable {
-        j = JenkinsRuleHelper.createAndStart(getClass());
-    }
-
-    @AfterAll
-    void tearDownJenkins() throws Throwable {
-        j.after();
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        this.j = rule;
     }
 
     /**
