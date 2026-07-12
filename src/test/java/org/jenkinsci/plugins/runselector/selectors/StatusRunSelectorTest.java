@@ -6,15 +6,13 @@ import hudson.model.TaskListener;
 import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
-import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,7 +22,7 @@ import static org.hamcrest.Matchers.is;
  *
  * @author Alexandru Somai
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithJenkins
 public class StatusRunSelectorTest {
 
     private JenkinsRule j;
@@ -34,19 +32,10 @@ public class StatusRunSelectorTest {
     private WorkflowRun failureRun;
     private WorkflowRun abortedRun;
 
-    @BeforeAll
-    void setUpJenkins() throws Throwable {
-        j = JenkinsRuleHelper.createAndStart(getClass());
-    }
-
-    @AfterAll
-    void tearDownJenkins() throws Throwable {
-        j.after();
-    }
-
-    @BeforeAll
+    @BeforeEach
     @SuppressWarnings("Duplicates")
-    void setUp() throws Exception {
+    void setUp(JenkinsRule rule) throws Exception {
+        this.j = rule;
         jobToSelect = j.jenkins.createProject(WorkflowJob.class, RandomStringUtils.randomAlphanumeric(7));
 
         jobToSelect.setDefinition(new CpsFlowDefinition("currentBuild.result = 'SUCCESS'"));

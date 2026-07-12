@@ -15,15 +15,13 @@ import org.jenkinsci.plugins.runselector.RunFilter;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
 import org.jenkinsci.plugins.runselector.selectors.StatusRunSelector;
-import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -35,25 +33,16 @@ import static org.hamcrest.Matchers.nullValue;
  *
  * @author Alexandru Somai
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithJenkins
 public class DisplayNameRunFilterTest {
 
     private JenkinsRule j;
     private FreeStyleProject jobToSelect;
 
-    @BeforeAll
-    void setUpJenkins() throws Throwable {
-        j = JenkinsRuleHelper.createAndStart(getClass());
-    }
-
-    @AfterAll
-    void tearDownJenkins() throws Throwable {
-        j.after();
-    }
-
-    @BeforeAll
+    @BeforeEach
     @SuppressWarnings("Duplicates")
-    void setUp() throws Exception {
+    void setUp(JenkinsRule rule) throws Exception {
+        this.j = rule;
         jobToSelect = j.createFreeStyleProject();
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
         j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));

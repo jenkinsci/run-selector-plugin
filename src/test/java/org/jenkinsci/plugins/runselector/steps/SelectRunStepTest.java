@@ -4,19 +4,16 @@ import hudson.model.Result;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.util.VersionNumber;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.BuildWatcherExtension;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.jvnet.localizer.LocaleProvider;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -35,28 +32,18 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  *
  * @author Alexandru Somai
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithJenkins
 public class SelectRunStepTest {
-
-    private JenkinsRule j;
 
     @RegisterExtension
     static final BuildWatcherExtension watcher = new BuildWatcherExtension();
 
+    private JenkinsRule j;
     private LocaleProvider providerToRestore;
 
-    @BeforeAll
-    void setUpJenkins() throws Throwable {
-        j = JenkinsRuleHelper.createAndStart(getClass());
-    }
-
-    @AfterAll
-    void tearDownJenkins() throws Throwable {
-        j.after();
-    }
-
     @BeforeEach
-    void setUp() {
+    void setUp(JenkinsRule rule) {
+        this.j = rule;
         providerToRestore = LocaleProvider.getProvider();
 
         // expect English messages

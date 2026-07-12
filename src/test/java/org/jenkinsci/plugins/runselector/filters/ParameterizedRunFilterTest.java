@@ -32,22 +32,20 @@ import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
 import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.plugins.runselector.steps.SelectRunStep;
-import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.steps.StepConfigTester;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 /**
  * Tests for {@link RunFilterParameter} and {@link ParameterizedRunFilter}
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithJenkins
 public class ParameterizedRunFilterTest {
     private JenkinsRule j;
 
@@ -55,18 +53,9 @@ public class ParameterizedRunFilterTest {
     private WorkflowRun runToSelect1;
     private WorkflowRun runToSelect2;
 
-    @BeforeAll
-    void setUpJenkins() throws Throwable {
-        j = JenkinsRuleHelper.createAndStart(getClass());
-    }
-
-    @AfterAll
-    void tearDownJenkins() throws Throwable {
-        j.after();
-    }
-
-    @BeforeAll
-    void prepareBuildsToSelect() throws Exception {
+    @BeforeEach
+    void prepareBuildsToSelect(JenkinsRule rule) throws Exception {
+        this.j = rule;
         jobToSelect = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)

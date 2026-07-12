@@ -44,6 +44,7 @@
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <maven.compiler.release>21</maven.compiler.release>
+        <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
     </properties>
 
     <dependencyManagement>
