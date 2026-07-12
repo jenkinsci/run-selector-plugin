@@ -1,18 +1,18 @@
 /*
  * The MIT License
- * 
+ *
  * Copyright (c) 2015 IKEDA Yasuyuki
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,33 +35,46 @@ import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.runselector.RunSelector;
 import org.jenkinsci.plugins.runselector.context.RunSelectorContext;
+import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.IOException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests for {@link ParameterizedRunSelector}
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParameterizedRunSelectorTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
+
+    @BeforeAll
+    void setUpJenkins() throws Throwable {
+        j = JenkinsRuleHelper.createAndStart(getClass());
+    }
+
+    @AfterAll
+    void tearDownJenkins() throws Throwable {
+        j.after();
+    }
 
     /**
      * Also applicable for workflow jobs.
      */
     @Issue("JENKINS-30357")
     @Test
-    public void testWorkflow() throws Exception {
+    void testWorkflow() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
 
@@ -84,7 +97,7 @@ public class ParameterizedRunSelectorTest {
      * Should not cause a fatal error even for a broken selectors.
      */
     @Test
-    public void testBrokenParameter() throws Exception {
+    void testBrokenParameter() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         FreeStyleProject selecter = j.createFreeStyleProject();
 
@@ -105,7 +118,7 @@ public class ParameterizedRunSelectorTest {
      * Should not cause a fatal error even for an unavailable selectors.
      */
     @Test
-    public void testUnavailableSelector() throws Exception {
+    void testUnavailableSelector() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         FreeStyleProject selecter = j.createFreeStyleProject();
 
@@ -126,7 +139,7 @@ public class ParameterizedRunSelectorTest {
      * Should not cause a fatal error even for an empty selectors.
      */
     @Test
-    public void testEmptySelector() throws Exception {
+    void testEmptySelector() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         FreeStyleProject selecter = j.createFreeStyleProject();
 
@@ -147,7 +160,7 @@ public class ParameterizedRunSelectorTest {
      * Also accepts immediate value.
      */
     @Test
-    public void testImmediateValue() throws Exception {
+    void testImmediateValue() throws Exception {
         // Prepare a job to be selected.
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
@@ -174,7 +187,7 @@ public class ParameterizedRunSelectorTest {
      * Also accepts variable expression.
      */
     @Test
-    public void testVariableExpression() throws Exception {
+    void testVariableExpression() throws Exception {
         FreeStyleProject jobToSelect = j.createFreeStyleProject();
         Run runToSelect = j.assertBuildStatusSuccess(jobToSelect.scheduleBuild2(0));
 
@@ -196,7 +209,7 @@ public class ParameterizedRunSelectorTest {
         assertThat(selectedRun, is(runToSelect));
     }
 
-    private static WorkflowJob createWorkflowJob() throws IOException {
+    private WorkflowJob createWorkflowJob() throws IOException {
         return j.jenkins.createProject(WorkflowJob.class, "test" + j.jenkins.getItems().size());
     }
 }

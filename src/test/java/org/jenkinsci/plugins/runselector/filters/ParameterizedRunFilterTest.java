@@ -32,29 +32,41 @@ import hudson.model.StringParameterDefinition;
 import hudson.model.StringParameterValue;
 import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.plugins.runselector.steps.SelectRunStep;
+import org.jenkinsci.plugins.runselector.testutils.JenkinsRuleHelper;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.steps.StepConfigTester;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 /**
  * Tests for {@link RunFilterParameter} and {@link ParameterizedRunFilter}
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParameterizedRunFilterTest {
-    @ClassRule
-    public static final JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
 
-    private static WorkflowJob jobToSelect;
-    private static WorkflowRun runToSelect1;
-    private static WorkflowRun runToSelect2;
+    private WorkflowJob jobToSelect;
+    private WorkflowRun runToSelect1;
+    private WorkflowRun runToSelect2;
 
-    @BeforeClass
-    public static void prepareBuildsToSelect() throws Exception {
+    @BeforeAll
+    void setUpJenkins() throws Throwable {
+        j = JenkinsRuleHelper.createAndStart(getClass());
+    }
+
+    @AfterAll
+    void tearDownJenkins() throws Throwable {
+        j.after();
+    }
+
+    @BeforeAll
+    void prepareBuildsToSelect() throws Exception {
         jobToSelect = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)
@@ -66,7 +78,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testConfigureBuildFilterParameter() throws Exception {
+    void testConfigureBuildFilterParameter() throws Exception {
         RunFilterParameter param = new RunFilterParameter(
             "PARAM",
             "description",
@@ -89,7 +101,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testConfigureParameterizedBuildFilter() throws Exception {
+    void testConfigureParameterizedBuildFilter() throws Exception {
         ParameterizedRunFilter filter = new ParameterizedRunFilter("${PARAM}");
         SelectRunStep step = new SelectRunStep("test");
         step.setFilter(filter);
@@ -98,7 +110,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testIsSelectableWithDefault() throws Exception {
+    void testIsSelectableWithDefault() throws Exception {
         WorkflowJob selecter = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)
@@ -124,7 +136,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testIsSelectableWithParameter() throws Exception {
+    void testIsSelectableWithParameter() throws Exception {
         WorkflowJob selecter = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)
@@ -155,7 +167,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testIsSelectableWithUI() throws Exception {
+    void testIsSelectableWithUI() throws Exception {
         WorkflowJob selecter = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)
@@ -187,7 +199,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testIsSelectableBadParameter() throws Exception {
+    void testIsSelectableBadParameter() throws Exception {
         WorkflowJob selecter = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)
@@ -219,7 +231,7 @@ public class ParameterizedRunFilterTest {
     }
 
     @Test
-    public void testIsSelectableEmptyParameter() throws Exception {
+    void testIsSelectableEmptyParameter() throws Exception {
         WorkflowJob selecter = j.jenkins.createProject(
             WorkflowJob.class,
             RandomStringUtils.randomAlphanumeric(7)

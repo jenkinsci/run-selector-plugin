@@ -29,32 +29,30 @@ import org.htmlunit.util.NameValuePair;
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.CaptureEnvironmentBuilder;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.net.URL;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test interaction of RunSelectorParameter with Jenkins core.
  *
  * @author Alan Harder
  */
+@WithJenkins
 public class RunSelectorParameterTest {
-
-    @Rule
-    public final JenkinsRule rule = new JenkinsRule();
 
     /**
      * Verify RunSelectorParameter works via HTML form, http POST and CLI.
      */
     @Test
-    public void testParameter() throws Exception {
+    public void testParameter(JenkinsRule rule) throws Exception {
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(
                 new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.SUCCESSFUL), "foo")));
@@ -90,7 +88,7 @@ public class RunSelectorParameterTest {
     }
 
     @Test
-    public void testConfiguration() throws Exception {
+    public void testConfiguration(JenkinsRule rule) throws Exception {
         RunSelectorParameter expected = new RunSelectorParameter("SELECTOR", new StatusRunSelector(StatusRunSelector.BuildStatus.STABLE), "foo");
         FreeStyleProject job = rule.createFreeStyleProject();
         job.addProperty(new ParametersDefinitionProperty(expected));
